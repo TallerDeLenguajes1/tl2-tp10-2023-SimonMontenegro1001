@@ -6,7 +6,7 @@ namespace kanban.Controllers;
 
 [ApiController]
 [Route("usuarios")]
-public class UsuarioController : ControllerBase
+public class UsuarioController : Controller
 {
     private readonly IUsuarioRepository usuarioRepository;
     private readonly ILogger<UsuarioController> _logger;
@@ -17,46 +17,64 @@ public class UsuarioController : ControllerBase
         usuarioRepository = new UsuarioRepository();
     }
 
-    [HttpPost]
-    public ActionResult<Usuario> CreateUsuario(Usuario user)
+    [HttpPost("crear")]
+    public IActionResult Crear([FromForm] Usuario user)
     {
-        usuarioRepository.CreateUser(user);
-        return Created("ubicacion del recurso", user);
+        usuarioRepository.Create(user);
+        return RedirectToAction("Index");
+    }
+
+    [HttpGet("crear")]
+    public IActionResult Crear()
+    {
+        return View(new Usuario());
     }
 
     [HttpGet]
-    public ActionResult<List<Usuario>> GetAllUsuarios()
+    public IActionResult Index()
     {
-        List<Usuario> users = usuarioRepository.ListUsers();
+        List<Usuario> users = usuarioRepository.List();
 
-        return Ok(users);
+        return View(users);
     }
 
-    [HttpGet("{userId}", Name = "GetUsuarioById")]
-    public ActionResult<Usuario> GetUsuarioById(int userId)
+    [HttpPost("eliminar/{id}")]
+    public IActionResult Eliminar(int id)
     {
-        var user = usuarioRepository.GetUserById(userId);
+        var board = usuarioRepository.GetById(id);
 
-        if (user.Id == 0) return NotFound("No existe el usuario");
+        if (board.Id == 0) return NotFound($"No existe el usuario con ID {id}");
 
-        return Ok(user);
+        usuarioRepository.Delete(id);
+
+        return RedirectToAction("Index");
     }
 
-    [HttpPut("{userId}/{NewUsername}")]
-    public ActionResult<Usuario> UpdateNombreUsuario(int userId, string NewUsername)
+    [HttpGet("editar/{id}")]
+    public IActionResult Editar(int id)
     {
-        var user = usuarioRepository.GetUserById(userId);
+        var board = usuarioRepository.GetById(id);
 
-        if (user.Id == 0)
+        if (board.Id == 0)
         {
-            return NotFound($"No se encontró el usuario con ID {userId}");
+            return NotFound($"No se encontró el usuario con ID {id}");
+        }
+        return View(board);
+    }
+
+    [HttpPost("editar/{id}")]
+    public IActionResult Editar(int id, [FromForm] Usuario newUser)
+    {
+        var existingBoard = usuarioRepository.GetById(id);
+
+        if (existingBoard.Id == 0)
+        {
+            return NotFound($"No se encontró el tablero con ID {id}");
         }
 
-        user.NombreDeUsuario = NewUsername;
+        usuarioRepository.Update(id, newUser);
 
-        usuarioRepository.UpdateUser(userId, user);
-
-        return Ok(user);
+        return RedirectToAction("Index");
     }
 
 }

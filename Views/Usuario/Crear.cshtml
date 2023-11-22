@@ -1,0 +1,11 @@
+@using kanban.Models
+@model Usuario
+
+<form asp-controller="Usuario" asp-action="Crear" method="post">
+    <div class="mb-3">
+        <label for="lbl.NombreDeUsuario" class="form-label" asp-for="NombreDeUsuario">Nombre: </label>
+        <input type="text" class="form-control" id="lbl.NombreDeUsuario" asp-for="NombreDeUsuario">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Crear</button>
+</form>

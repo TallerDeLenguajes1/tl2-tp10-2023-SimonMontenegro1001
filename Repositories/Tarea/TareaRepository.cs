@@ -6,7 +6,7 @@ namespace kanban.Repository;
 public class TareaRepository : ITareaRepository
 {
     private readonly string connectionString = "Data Source=DB/kanban.db;Cache=Shared";
-    public void AssignUserToTask(int userId, int taskId)
+    public void AssignUser(int userId, int taskId)
     {
         var queryString = @"UPDATE Tarea SET id_usuario_asignado = @userId WHERE id = @taskId;";
 
@@ -21,7 +21,7 @@ public class TareaRepository : ITareaRepository
         connection.Close();
     }
 
-    public void CreateTask(int boardId, Tarea task)
+    public void Create(int boardId, Tarea task)
     {
         var query = $"INSERT INTO tarea (id_tablero, nombre, estado, descripcion, color, id_usuario_asignado) VALUES (@id_tablero, @name, @estado, @descripcion, @color, @usuario)";
         using SQLiteConnection connection = new(connectionString);
@@ -41,7 +41,7 @@ public class TareaRepository : ITareaRepository
         connection.Close();
     }
 
-    public void DeleteTask(int taskId)
+    public void Delete(int taskId)
     {
         using var connection = new SQLiteConnection(connectionString);
         connection.Open();
@@ -51,7 +51,7 @@ public class TareaRepository : ITareaRepository
         command.ExecuteNonQuery();
     }
 
-    public Tarea GetTaskById(int taskId)
+    public Tarea GetById(int taskId)
     {
         var task = new Tarea();
 
@@ -77,7 +77,7 @@ public class TareaRepository : ITareaRepository
         return task;
     }
 
-    public List<Tarea> ListTasksByBoard(int boardId)
+    public List<Tarea> ListByBoard(int boardId)
     {
         var queryString = @"SELECT * FROM Tarea WHERE id_tablero = @boardId;";
         var tasks = new List<Tarea>();
@@ -110,7 +110,7 @@ public class TareaRepository : ITareaRepository
         return tasks;
     }
 
-    public List<Tarea> ListTasksByUser(int userId)
+    public List<Tarea> ListByUser(int userId)
     {
         var queryString = @"SELECT * FROM tarea WHERE id_usuario_asignado = @userId;";
         var tasks = new List<Tarea>();
@@ -143,7 +143,7 @@ public class TareaRepository : ITareaRepository
         return tasks;
     }
 
-    public void UpdateTask(int taskId, Tarea task)
+    public void Update(int taskId, Tarea task)
     {
         var queryString = @"UPDATE tarea SET nombre = @name, estado = @status, descripcion = @description, color = @color
                         WHERE id = @taskId;";

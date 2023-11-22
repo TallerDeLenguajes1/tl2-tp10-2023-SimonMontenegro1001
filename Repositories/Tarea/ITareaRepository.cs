@@ -3,11 +3,11 @@ using kanban.Models;
 namespace kanban.Repository;
 public interface ITareaRepository
 {
-    public void CreateTask(int boardId, Tarea task);
-    public void UpdateTask(int taskId, Tarea task);
-    public Tarea GetTaskById(int taskId);
-    public List<Tarea> ListTasksByUser(int userId);
-    public List<Tarea> ListTasksByBoard(int boardId);
-    public void DeleteTask(int taskId);
-    public void AssignUserToTask(int userId, int taskId);
+    public void Create(int boardId, Tarea task);
+    public void Update(int taskId, Tarea task);
+    public Tarea GetById(int taskId);
+    public List<Tarea> ListByUser(int userId);
+    public List<Tarea> ListByBoard(int boardId);
+    public void Delete(int taskId);
+    public void AssignUser(int userId, int taskId);
 }

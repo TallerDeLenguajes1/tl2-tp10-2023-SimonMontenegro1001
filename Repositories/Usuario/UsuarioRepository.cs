@@ -6,7 +6,7 @@ namespace kanban.Repository;
 public class UsuarioRepository : IUsuarioRepository
 {
     private readonly string connectionString = "Data Source=DB/kanban.db;Cache=Shared";
-    public void CreateUser(Usuario user)
+    public void Create(Usuario user)
     {
         var query = $"INSERT INTO usuario (nombre_de_usuario) VALUES (@username)";
         using var connection = new SQLiteConnection(connectionString);
@@ -20,7 +20,7 @@ public class UsuarioRepository : IUsuarioRepository
         connection.Close();
     }
 
-    public void DeleteUser(int userId)
+    public void Delete(int userId)
     {
         using var connection = new SQLiteConnection(connectionString);
         connection.Open();
@@ -30,7 +30,7 @@ public class UsuarioRepository : IUsuarioRepository
         command.ExecuteNonQuery();
     }
 
-    public Usuario GetUserById(int userId)
+    public Usuario GetById(int userId)
     {
 
         var user = new Usuario();
@@ -54,7 +54,7 @@ public class UsuarioRepository : IUsuarioRepository
         return user;
     }
 
-    public List<Usuario> ListUsers()
+    public List<Usuario> List()
     {
         var queryString = @"SELECT * FROM usuario;";
         var users = new List<Usuario>();
@@ -80,7 +80,7 @@ public class UsuarioRepository : IUsuarioRepository
         return users;
     }
 
-    public void UpdateUser(int userId, Usuario user)
+    public void Update(int userId, Usuario user)
     {
         using var connection = new SQLiteConnection(connectionString);
         connection.Open();
