@@ -1,0 +1,40 @@
+@using kanban.Models
+@model Tarea
+
+<form asp-controller="Tarea" asp-action="Crear" method="post">
+
+    <div class="mb-3">
+        <label for="lbl.IdUsuarioAsignado" class="form-label" asp-for="IdUsuarioAsignado">ID Usuario Asignado:
+        </label>
+        <input type="number" class="form-control" id="lbl.IdUsuarioAsignado" asp-for="IdUsuarioAsignado">
+    </div>
+
+    <div class="mb-3">
+        <label for="lbl.IdTablero" class="form-label" asp-for="IdTablero">ID Tablero:
+        </label>
+        <input type="number" class="form-control" id="lbl.IdTablero" asp-for="IdTablero">
+    </div>
+
+    <div class="mb-3">
+        <label for="lbl.nombre" class="form-label" asp-for="Nombre">Nombre: </label>
+        <input type="text" class="form-control" id="lbl.nombre" asp-for="Nombre">
+    </div>
+
+    <div class="mb-3">
+        <label for="lbl.descripcion" class="form-label" asp-for="Descripcion">Descripción: </label>
+        <input type="text" class="form-control" id="lbl.descripcion" asp-for="Descripcion">
+    </div>
+
+    <div class="mb-3">
+        <label for="lbl.color" class="form-label" asp-for="Color">Color: </label>
+        <input type="text" class="form-control" id="lbl.color" asp-for="Color">
+    </div>
+
+    <div class="mb-3">
+        <label for="lbl.Estado" class="form-label" asp-for="Estado">Estado: </label>
+        <input type="text" class="form-control" id="lbl.Estado" asp-for="Estado">
+    </div>
+
+
+    <button type="submit" class="btn btn-primary">Crear</button>
+</form>

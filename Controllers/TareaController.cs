@@ -1,99 +1,78 @@
-// using kanban.Models;
-// using kanban.Repository;
-// using Microsoft.AspNetCore.Mvc;
+using kanban.Models;
+using kanban.Repository;
+using Microsoft.AspNetCore.Mvc;
 
 
-// namespace kanban.Controllers;
+namespace kanban.Controllers;
 
-// [ApiController]
-// [Route("tareas")]
+[ApiController]
+[Route("tareas")]
 
-// public class TareaController : Controller
-// {
-//     private readonly ITareaRepository tareaRepository;
-//     private readonly ILogger<TareaController> _logger;
+public class TareaController : Controller
+{
+    private readonly ITareaRepository tareaRepository;
+    private readonly ILogger<TareaController> _logger;
 
-//     public TareaController(ILogger<TareaController> logger)
-//     {
-//         _logger = logger;
-//         tareaRepository = new TareaRepository();
-//     }
+    public TareaController(ILogger<TareaController> logger)
+    {
+        _logger = logger;
+        tareaRepository = new TareaRepository();
+    }
 
-//     [HttpPost("crear")]
-//     public IActionResult CreateTarea(int boardId, Tarea task)
-//     {
-//         tareaRepository.Create(boardId, task);
-//         return RedirectToAction("Index");
-//     }
-//     [HttpGet("crear")]
-//     public IActionResult CreateTarea()
-//     {
-//         return View(new Tarea());
-//     }
+    [HttpPost("crear")]
+    public IActionResult Crear(int userId, [FromForm] Tarea task)
+    {
+        tareaRepository.Create(userId, task);
+        return RedirectToAction("Index", new { id = task.IdUsuarioAsignado });
+    }
 
-//     [HttpPut("{id}/Nombre/{nombre}")]
-//     public ActionResult<Tarea> UpdateNombreTarea(int id, string nombre)
-//     {
-//         var tarea = tareaRepository.GetTaskById(id);
+    [HttpGet("crear")]
+    public IActionResult Crear()
+    {
+        return View(new Tarea());
+    }
 
-//         if (tarea.Id == 0) return NotFound();
+    [HttpPost("editar/{id}")]
+    public IActionResult Editar(int id, [FromForm] Tarea tarea)
+    {
+        var task = tareaRepository.GetById(id);
 
-//         tarea.Nombre = nombre;
+        if (task.Id == 0) return NotFound($"No se encontró la tarea con ID {id}");
 
-//         tareaRepository.UpdateTask(id, tarea);
+        tareaRepository.Update(id, tarea);
+        return RedirectToAction("Index", new { id = task.IdUsuarioAsignado });
+    }
 
-//         return Ok(tarea);
-//     }
-//     [HttpPut("{id}/Estado/{estado}")]
-//     public ActionResult<Tarea> UpdateEstadoTarea(int id, EstadoTarea estado)
-//     {
-//         var tarea = tareaRepository.GetTaskById(id);
+    [HttpGet("editar/{id}")]
+    public IActionResult Editar(int id)
+    {
+        var tarea = tareaRepository.GetById(id);
 
-//         if (tarea.Id == 0) return NotFound();
+        if (tarea.Id == 0)
+        {
+            return NotFound($"No se encontró la tarea con ID {id}");
+        }
 
-//         tarea.Estado = estado;
+        return View(tarea);
+    }
 
-//         tareaRepository.UpdateTask(id, tarea);
+    [HttpPost("eliminar/{id}")]
+    public IActionResult Eliminar(int id)
+    {
+        var tarea = tareaRepository.GetById(id);
 
-//         return Ok(tarea);
-//     }
-//     [HttpDelete("{id}")]
-//     public ActionResult DeleteTarea(int id)
-//     {
-//         var tarea = tareaRepository.GetTaskById(id);
+        if (tarea.Id == 0) return NotFound();
 
-//         if (tarea.Id == 0) return NotFound();
+        tareaRepository.Delete(id);
 
-//         tareaRepository.DeleteTask(id);
+        return RedirectToAction("Index", new { id = tarea.IdUsuarioAsignado });
+    }
 
-//         return NoContent();
-//     }
+    [HttpGet("{id}")]
+    public IActionResult Index(int id)
+    {
+        var tareas = tareaRepository.ListByUser(id);
 
-//     // faltaria agregar una funcion en la interfaz e implementar en el repositorio de tarea
-
-//     // [HttpGet("{estado}")]
-//     // public ActionResult<int> GetCantidadTareasPorEstado(string estado)
-//     // {
-//     //     var cantidad = tareaRepository.GetCantidadTareasPorEstado(estado);
-
-//     //     return Ok(cantidad);
-//     // }
-
-//     [HttpGet("Usuario/{id}")]
-//     public ActionResult<List<Tarea>> GetTareasPorUsuario(int id)
-//     {
-//         var tareas = tareaRepository.ListTasksByUser(id);
-
-//         return Ok(tareas);
-//     }
-
-//     [HttpGet("Tablero/{id}")]
-//     public ActionResult<List<Tarea>> GetTareasPorTablero(int id)
-//     {
-//         var tareas = tareaRepository.ListTasksByBoard(id);
-
-//         return Ok(tareas);
-//     }
-
-
-// }
+        return View(tareas);
+    }
+}
