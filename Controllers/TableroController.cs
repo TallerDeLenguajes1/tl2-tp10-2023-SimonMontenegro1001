@@ -9,12 +9,14 @@ namespace kanban.Controllers;
 public class TableroController : Controller
 {
     private readonly ITableroRepository tableroRepository;
+    private readonly ITareaRepository tareaRepository;
     private readonly ILogger<TableroController> _logger;
 
     public TableroController(ILogger<TableroController> logger)
     {
         _logger = logger;
         tableroRepository = new TableroRepository();
+        tareaRepository = new TareaRepository();
     }
 
     [HttpGet("crear")]
@@ -47,6 +49,12 @@ public class TableroController : Controller
 
         if (board.Id == 0) return NotFound($"No existe el tablero con ID {id}");
 
+        var tasksToDelete = tareaRepository.ListByBoard(id);
+        foreach (var task in tasksToDelete)
+        {
+            tareaRepository.Delete(task.Id);
+        }
+
         tableroRepository.Delete(id);
 
         return RedirectToAction("Index");
@@ -78,5 +86,4 @@ public class TableroController : Controller
 
         return RedirectToAction("Index");
     }
-
 }

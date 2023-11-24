@@ -5,8 +5,7 @@
 @using kanban.Models
 @model List<Tablero>
 
-
-<h2>Product List</h2>
+<h2>Tableros</h2>
 <a asp-controller="Tablero" asp-action="Crear">Crear Tablero</a>
 
 <table class="table table-dark">
@@ -16,6 +15,9 @@
             <th>Usuario Propietario</th>
             <th>Nombre</th>
             <th>Descripcion</th>
+            <th></th>
+            <th></th>
+            <th></th>
             <th></th>
         </tr>
     </thead>
@@ -29,6 +31,14 @@
                 <td>@tablero.Descripcion</td>
                 <td>
                     <a asp-controller="Tablero" asp-action="Editar" asp-route-id="@tablero.Id">Editar</a>
+                </td>
+                <td>
+                    <a asp-controller="Tarea" asp-action="ListByBoard" asp-route-id="@tablero.Id">Ver Tareas</a>
+                </td>
+                <td>
+                    <a asp-controller="Tarea" asp-action="Crear" asp-route-id="@tablero.Id">Crear Tarea</a>
+                </td>
+                <td>
                     <form asp-controller="Tablero" asp-action="Eliminar" asp-route-id="@tablero.Id" method="post"
                         onsubmit="return confirm('¿Estás seguro de que deseas eliminar este tablero?')">
                         <input type="hidden" name="_method" value="delete" />

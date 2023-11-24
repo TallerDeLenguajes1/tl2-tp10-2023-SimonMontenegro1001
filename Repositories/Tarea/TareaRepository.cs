@@ -145,7 +145,7 @@ public class TareaRepository : ITareaRepository
 
     public void Update(int taskId, Tarea task)
     {
-        var queryString = @"UPDATE tarea SET nombre = @name, estado = @status, descripcion = @description, color = @color
+        var queryString = @"UPDATE tarea SET id_usuario_asignado = @userId, id_tablero = @boardId, nombre = @name, estado = @status, descripcion = @description, color = @color
                         WHERE id = @taskId;";
 
         using var connection = new SQLiteConnection(connectionString);
@@ -153,6 +153,8 @@ public class TareaRepository : ITareaRepository
 
         connection.Open();
 
+        command.Parameters.Add(new SQLiteParameter("@userId", task.IdUsuarioAsignado));
+        command.Parameters.Add(new SQLiteParameter("@boardId", task.IdTablero));
         command.Parameters.Add(new SQLiteParameter("@name", task.Nombre));
         command.Parameters.Add(new SQLiteParameter("@status", task.Estado));
         command.Parameters.Add(new SQLiteParameter("@description", task.Descripcion));

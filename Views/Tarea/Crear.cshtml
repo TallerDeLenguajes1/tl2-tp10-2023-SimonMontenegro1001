@@ -2,17 +2,11 @@
 @model Tarea
 
 <form asp-controller="Tarea" asp-action="Crear" method="post">
-
+    <input type="hidden" name="tableroId" value="@Model.IdTablero" />
     <div class="mb-3">
         <label for="lbl.IdUsuarioAsignado" class="form-label" asp-for="IdUsuarioAsignado">ID Usuario Asignado:
         </label>
         <input type="number" class="form-control" id="lbl.IdUsuarioAsignado" asp-for="IdUsuarioAsignado">
-    </div>
-
-    <div class="mb-3">
-        <label for="lbl.IdTablero" class="form-label" asp-for="IdTablero">ID Tablero:
-        </label>
-        <input type="number" class="form-control" id="lbl.IdTablero" asp-for="IdTablero">
     </div>
 
     <div class="mb-3">
