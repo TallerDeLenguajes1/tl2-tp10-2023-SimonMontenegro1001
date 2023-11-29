@@ -1,5 +1,6 @@
 using kanban.Models;
 using kanban.Repository;
+using kanban.Controllers.helpers;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -22,74 +23,109 @@ public class TareaController : Controller
     [HttpPost("crear/{boardId}")]
     public IActionResult Crear(int boardId, [FromForm] Tarea task)
     {
-        tareaRepository.Create(boardId, task);
-        return RedirectToAction("ListByBoard", new { id = boardId });
+        if (LoginHelper.IsLogged(HttpContext))
+        {
+            tareaRepository.Create(boardId, task);
+            return RedirectToAction("ListByBoard", new { id = boardId });
+
+        }
+        return RedirectToAction("Index", "Login");
     }
 
     [HttpGet("crear/{id}")]
     public IActionResult Crear(int tableroId)
     {
-        var tarea = new Tarea
+        if (LoginHelper.IsLogged(HttpContext))
         {
-            IdTablero = tableroId
-        };
-        return View(tarea);
+            var tarea = new Tarea
+            {
+                IdTablero = tableroId
+            };
+            return View(tarea);
+
+        }
+        return RedirectToAction("Index", "Login");
     }
 
     [HttpGet("editar/{id}")]
     public IActionResult Editar(int id)
     {
-        var tarea = tareaRepository.GetById(id);
-
-        if (tarea.Id == 0)
+        if (LoginHelper.IsLogged(HttpContext))
         {
-            return NotFound($"No se encontró la tarea con ID {id}");
-        }
 
-        return View(tarea);
+            var tarea = tareaRepository.GetById(id);
+
+            if (tarea.Id == 0)
+            {
+                return NotFound($"No se encontró la tarea con ID {id}");
+            }
+
+            return View(tarea);
+        }
+        return RedirectToAction("Index", "Login");
     }
 
     [HttpPost("editar/{id}")]
     public IActionResult Editar(int id, [FromForm] Tarea tarea)
     {
-        var task = tareaRepository.GetById(id);
-
-        if (task.Id == 0)
+        if (LoginHelper.IsLogged(HttpContext))
         {
-            return NotFound($"No se encontró la tarea con ID {id}");
-        }
 
-        tareaRepository.Update(id, tarea);
-        return RedirectToAction("ListByBoard", new { id = task.IdTablero });
+            var task = tareaRepository.GetById(id);
+
+            if (task.Id == 0)
+            {
+                return NotFound($"No se encontró la tarea con ID {id}");
+            }
+
+            tareaRepository.Update(id, tarea);
+            return RedirectToAction("ListByBoard", new { id = task.IdTablero });
+        }
+        return RedirectToAction("Index", "Login");
     }
 
     [HttpPost("eliminar/{id}")]
     public IActionResult Eliminar(int id)
     {
-        var tarea = tareaRepository.GetById(id);
-
-        if (tarea.Id == 0)
+        if (LoginHelper.IsLogged(HttpContext))
         {
-            return NotFound();
-        }
 
-        tareaRepository.Delete(id);
-        return RedirectToAction("ListByBoard", new { id = tarea.IdTablero });
+            var tarea = tareaRepository.GetById(id);
+
+            if (tarea.Id == 0)
+            {
+                return NotFound();
+            }
+
+            tareaRepository.Delete(id);
+            return RedirectToAction("ListByBoard", new { id = tarea.IdTablero });
+        }
+        return RedirectToAction("Index", "Login");
     }
 
     [HttpGet("usuario/{id}")]
     public IActionResult Index(int id)
     {
-        var tareas = tareaRepository.ListByUser(id);
+        if (LoginHelper.IsLogged(HttpContext))
+        {
 
-        return View(tareas);
+            var tareas = tareaRepository.ListByUser(id);
+
+            return View(tareas);
+        }
+        return RedirectToAction("Index", "Login");
     }
 
     [HttpGet("tablero/{id}")]
     public IActionResult ListByBoard(int id)
     {
-        var tareas = tareaRepository.ListByBoard(id);
+        if (LoginHelper.IsLogged(HttpContext))
+        {
 
-        return View(tareas);
+            var tareas = tareaRepository.ListByBoard(id);
+
+            return View(tareas);
+        }
+        return RedirectToAction("Index", "Login");
     }
 }

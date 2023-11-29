@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using kanban.Repository;
+using kanban.Controllers.helpers;
 using kanban.Models;
 
 namespace kanban.Controllers;
@@ -27,54 +28,79 @@ public class UsuarioController : Controller
     [HttpGet("crear")]
     public IActionResult Crear()
     {
-        return View(new Usuario());
+        if (LoginHelper.IsLogged(HttpContext))
+        {
+
+            return View(new Usuario());
+        }
+        return RedirectToAction("Index", "Login");
     }
 
     [HttpGet]
     public IActionResult Index()
     {
-        List<Usuario> users = usuarioRepository.List();
+        if (LoginHelper.IsLogged(HttpContext))
+        {
 
-        return View(users);
+            List<Usuario> users = usuarioRepository.List();
+
+            return View(users);
+        }
+        return RedirectToAction("Index", "Login");
     }
 
     [HttpPost("eliminar/{id}")]
     public IActionResult Eliminar(int id)
     {
-        var board = usuarioRepository.GetById(id);
+        if (LoginHelper.IsLogged(HttpContext))
+        {
 
-        if (board.Id == 0) return NotFound($"No existe el usuario con ID {id}");
+            var board = usuarioRepository.GetById(id);
 
-        usuarioRepository.Delete(id);
+            if (board.Id == 0) return NotFound($"No existe el usuario con ID {id}");
 
-        return RedirectToAction("Index");
+            usuarioRepository.Delete(id);
+
+            return RedirectToAction("Index");
+        }
+        return RedirectToAction("Index", "Login");
     }
 
     [HttpGet("editar/{id}")]
     public IActionResult Editar(int id)
     {
-        var board = usuarioRepository.GetById(id);
-
-        if (board.Id == 0)
+        if (LoginHelper.IsLogged(HttpContext))
         {
-            return NotFound($"No se encontró el usuario con ID {id}");
+
+            var board = usuarioRepository.GetById(id);
+
+            if (board.Id == 0)
+            {
+                return NotFound($"No se encontró el usuario con ID {id}");
+            }
+            return View(board);
         }
-        return View(board);
+        return RedirectToAction("Index", "Login");
     }
 
     [HttpPost("editar/{id}")]
     public IActionResult Editar(int id, [FromForm] Usuario newUser)
     {
-        var existingBoard = usuarioRepository.GetById(id);
-
-        if (existingBoard.Id == 0)
+        if (LoginHelper.IsLogged(HttpContext))
         {
-            return NotFound($"No se encontró el tablero con ID {id}");
+
+            var existingBoard = usuarioRepository.GetById(id);
+
+            if (existingBoard.Id == 0)
+            {
+                return NotFound($"No se encontró el tablero con ID {id}");
+            }
+
+            usuarioRepository.Update(id, newUser);
+
+            return RedirectToAction("Index");
         }
-
-        usuarioRepository.Update(id, newUser);
-
-        return RedirectToAction("Index");
+        return RedirectToAction("Index", "Login");
     }
 
 }

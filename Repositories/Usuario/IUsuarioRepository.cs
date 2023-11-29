@@ -7,5 +7,6 @@ public interface IUsuarioRepository
     public void Update(int userId, Usuario user);
     public List<Usuario> List();
     public Usuario GetById(int userId);
+    public Usuario GetByUsername(string username);
     public void Delete(int userId);
 }

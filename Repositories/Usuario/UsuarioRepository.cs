@@ -8,12 +8,13 @@ public class UsuarioRepository : IUsuarioRepository
     private readonly string connectionString = "Data Source=DB/kanban.db;Cache=Shared";
     public void Create(Usuario user)
     {
-        var query = $"INSERT INTO usuario (nombre_de_usuario) VALUES (@username)";
+        var query = $"INSERT INTO usuario (nombre_de_usuario,rol) VALUES (@username,@rol)";
         using var connection = new SQLiteConnection(connectionString);
         connection.Open();
         var command = new SQLiteCommand(query, connection);
 
         command.Parameters.Add(new SQLiteParameter("@username", user.NombreDeUsuario));
+        command.Parameters.Add(new SQLiteParameter("@rol", user.Rol));
 
         command.ExecuteNonQuery();
 
@@ -89,6 +90,31 @@ public class UsuarioRepository : IUsuarioRepository
         command.Parameters.Add(new SQLiteParameter("@username", user.NombreDeUsuario));
         command.Parameters.Add(new SQLiteParameter("@userId", userId));
         command.ExecuteNonQuery();
+    }
+
+    public Usuario GetByUsername(string username)
+    {
+        var user = new Usuario();
+
+        using (var connection = new SQLiteConnection(connectionString))
+        {
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT * FROM usuario WHERE nombre_de_usuario = @nombre_de_usuario";
+            command.Parameters.Add(new SQLiteParameter("@nombre_de_usuario", username));
+            connection.Open();
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    user.Id = Convert.ToInt32(reader["id"]);
+                    user.NombreDeUsuario = reader["nombre_de_usuario"].ToString();
+                    user.Rol = (Roles)Convert.ToInt32(reader["rol"]);
+                    user.Contrasena = reader["contrasena"].ToString();
+                }
+            }
+            connection.Close();
+        }
+        return user;
     }
 
 }

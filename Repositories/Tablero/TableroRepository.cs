@@ -111,6 +111,7 @@ public class TableroRepository : ITableroRepository
         using (var connection = new SQLiteConnection(connectionString))
         {
             var command = new SQLiteCommand(queryString, connection);
+            command.Parameters.Add(new SQLiteParameter("userId", userId));
             connection.Open();
 
             using (SQLiteDataReader reader = command.ExecuteReader())

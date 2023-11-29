@@ -1,5 +1,6 @@
 using kanban.Models;
 using kanban.Repository;
+using kanban.Controllers.helpers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace kanban.Controllers;
@@ -22,68 +23,106 @@ public class TableroController : Controller
     [HttpGet("crear")]
     public IActionResult Crear()
     {
-        return View(new Tablero());
+
+        if (LoginHelper.IsLogged(HttpContext)) return View(new Tablero());
+        return RedirectToAction("Index", "Login");
     }
 
     [HttpPost("crear")]
     public IActionResult Crear([FromForm] Tablero board)
     {
-        tableroRepository.Create(board);
-        return RedirectToAction("Index");
+
+        if (LoginHelper.IsLogged(HttpContext))
+        {
+            tableroRepository.Create(board);
+            return RedirectToAction("Index");
+        }
+
+        return RedirectToAction("Index", "Login");
+
     }
 
     [HttpGet]
     public IActionResult Index()
     {
-        List<Tablero> boards = tableroRepository.List();
+        if (LoginHelper.IsLogged(HttpContext))
+        {
+            List<Tablero> boards = new();
+            if (LoginHelper.IsAdmin(HttpContext))
+            {
+                boards = tableroRepository.List();
+            }
+            else
+            {
+                boards = tableroRepository.ListUserBoards(LoginHelper.GetUserId(HttpContext));
+            }
 
-        if (boards != null) return View(boards);
+            if (boards != null) return View(boards);
 
-        return NotFound();
+            return NotFound();
+        }
+        return RedirectToAction("Index", "Login");
     }
 
     [HttpPost("eliminar/{id}")]
     public IActionResult Eliminar(int id)
     {
-        var board = tableroRepository.GetById(id);
-
-        if (board.Id == 0) return NotFound($"No existe el tablero con ID {id}");
-
-        var tasksToDelete = tareaRepository.ListByBoard(id);
-        foreach (var task in tasksToDelete)
+        if (LoginHelper.IsLogged(HttpContext))
         {
-            tareaRepository.Delete(task.Id);
+            var board = tableroRepository.GetById(id);
+
+            if (board.Id == 0) return NotFound($"No existe el tablero con ID {id}");
+
+            var tasksToDelete = tareaRepository.ListByBoard(id);
+            foreach (var task in tasksToDelete)
+            {
+                tareaRepository.Delete(task.Id);
+            }
+
+            tableroRepository.Delete(id);
+
+            return RedirectToAction("Index");
         }
+        return RedirectToAction("Index", "Login");
 
-        tableroRepository.Delete(id);
 
-        return RedirectToAction("Index");
     }
 
     [HttpGet("editar/{id}")]
     public IActionResult Editar(int id)
     {
-        var board = tableroRepository.GetById(id);
 
-        if (board.Id == 0)
+        if (LoginHelper.IsLogged(HttpContext))
         {
-            return NotFound($"No se encontró el tablero con ID {id}");
+            var board = tableroRepository.GetById(id);
+
+            if (board.Id == 0)
+            {
+                return NotFound($"No se encontró el tablero con ID {id}");
+            }
+            return View(board);
         }
-        return View(board);
+        return RedirectToAction("Index", "Login");
+
     }
 
     [HttpPost("editar/{id}")]
     public IActionResult Editar(int id, [FromForm] Tablero newBoard)
     {
-        var existingBoard = tableroRepository.GetById(id);
-
-        if (existingBoard.Id == 0)
+        if (LoginHelper.IsLogged(HttpContext))
         {
-            return NotFound($"No se encontró el tablero con ID {id}");
+            var existingBoard = tableroRepository.GetById(id);
+
+            if (existingBoard.Id == 0)
+            {
+                return NotFound($"No se encontró el tablero con ID {id}");
+            }
+
+            tableroRepository.Update(id, newBoard);
+
+            return RedirectToAction("Index");
+
         }
-
-        tableroRepository.Update(id, newBoard);
-
-        return RedirectToAction("Index");
+        return RedirectToAction("Index", "Login");
     }
 }
