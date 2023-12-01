@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using kanban.Models;
 using kanban.Repository;
+using kanban.Controllers.Helpers;
+using kanban.ViewModels;
 namespace kanban.Controllers;
 
 public class LoginController : Controller
@@ -16,26 +18,29 @@ public class LoginController : Controller
     [HttpGet]
     public IActionResult Index()
     {
-        return View();
+        return View(new LoginViewModel());
     }
 
     [HttpPost]
-    public IActionResult Login(string username, string password)
+    public IActionResult Login(LoginViewModel loginModel)
     {
-        var sesionUsuario = HttpContext.Session.GetString("usuario");
-        var sesionId = HttpContext.Session.GetString("id");
+        var sessionUsername = LoginHelper.GetUserName(HttpContext);
+        var sessionId = LoginHelper.GetUserId(HttpContext);
 
-        if (!string.IsNullOrEmpty(sesionUsuario) && !string.IsNullOrEmpty(sesionId))
+        if (!string.IsNullOrEmpty(sessionUsername) && !string.IsNullOrEmpty(sessionId))
         {
-            var sesionUser = usuarioRepository.GetById(int.Parse(sesionId));
-            if (sesionUser.NombreDeUsuario == username) return RedirectToAction("Index", "Home");
+            var sessionUser = usuarioRepository.GetById(int.Parse(sessionId));
+            if (sessionUser.NombreDeUsuario == loginModel.Username)
+            {
+                return RedirectToAction("Index", "Home");
+            }
         }
 
-        var user = usuarioRepository.GetByUsername(username);
+        var userFound = usuarioRepository.GetByUsername(loginModel.Username);
 
-        if (user != null && user.Contrasena == password)
+        if (userFound != null && userFound.Contrasena == loginModel.Password)
         {
-            LoguearUsuario(user);
+            LogInUser(userFound);
             return RedirectToAction("Index", "Home");
         }
         else
@@ -44,10 +49,10 @@ public class LoginController : Controller
         }
     }
 
-    private void LoguearUsuario(Usuario usuario)
+    private void LogInUser(Usuario user)
     {
-        HttpContext.Session.SetString("id", usuario.Id.ToString());
-        HttpContext.Session.SetString("usuario", usuario.NombreDeUsuario);
-        HttpContext.Session.SetString("rol", usuario.Rol.ToString());
+        HttpContext.Session.SetString("id", user.Id.ToString());
+        HttpContext.Session.SetString("usuario", user.NombreDeUsuario);
+        HttpContext.Session.SetString("rol", user.Rol.ToString());
     }
 }

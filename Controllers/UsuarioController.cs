@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using kanban.Repository;
-using kanban.Controllers.helpers;
+using kanban.Controllers.Helpers;
 using kanban.Models;
 
 namespace kanban.Controllers;

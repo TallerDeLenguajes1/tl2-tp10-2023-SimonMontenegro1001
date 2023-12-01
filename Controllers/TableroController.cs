@@ -1,6 +1,7 @@
 using kanban.Models;
 using kanban.Repository;
-using kanban.Controllers.helpers;
+using kanban.Controllers.Helpers;
+using kanban.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace kanban.Controllers;
@@ -24,20 +25,31 @@ public class TableroController : Controller
     public IActionResult Crear()
     {
         if (!LoginHelper.IsLogged(HttpContext)) return RedirectToAction("Index", "Login");
-
-        ViewBag.EsAdmin = LoginHelper.IsAdmin(HttpContext);
-        return View(new Tablero());
+        CrearTableroViewModel crearTableroModel = new()
+        {
+            IsAdmin = LoginHelper.IsAdmin(HttpContext)
+        };
+        return View(crearTableroModel);
     }
 
     [HttpPost("crear")]
-    public IActionResult Crear([FromForm] Tablero board)
+    public IActionResult Crear([FromForm] CrearTableroViewModel crearTableroModel)
     {
 
         if (!LoginHelper.IsLogged(HttpContext)) return RedirectToAction("Index", "Login");
 
-        if (!LoginHelper.IsAdmin(HttpContext)) board.IdUsuarioPropietario = LoginHelper.GetUserId(HttpContext);
+        var tablero = new Tablero()
+        {
+            Nombre = crearTableroModel.Nombre,
+            Descripcion = crearTableroModel.Descripcion,
+        };
 
-        tableroRepository.Create(board);
+        if (!LoginHelper.IsAdmin(HttpContext))
+        {
+            tablero.IdUsuarioPropietario = int.Parse(LoginHelper.GetUserId(HttpContext));
+        }
+
+        tableroRepository.Create(tablero);
 
         return RedirectToAction("Index");
     }
@@ -52,7 +64,7 @@ public class TableroController : Controller
         ViewBag.EsAdmin = LoginHelper.IsAdmin(HttpContext);
 
         if (LoginHelper.IsAdmin(HttpContext)) boards = tableroRepository.List();
-        else boards = tableroRepository.ListUserBoards(LoginHelper.GetUserId(HttpContext));
+        else boards = tableroRepository.ListUserBoards(int.Parse(LoginHelper.GetUserId(HttpContext)));
 
         return View(boards);
     }
@@ -69,7 +81,7 @@ public class TableroController : Controller
 
         if (!LoginHelper.IsAdmin(HttpContext))
         {
-            var userBoards = tableroRepository.ListUserBoards(LoginHelper.GetUserId(HttpContext));
+            var userBoards = tableroRepository.ListUserBoards(int.Parse(LoginHelper.GetUserId(HttpContext)));
             var foundBoard = userBoards.Find(board => board.Id == id);
             if (foundBoard != null)
             {
@@ -114,7 +126,7 @@ public class TableroController : Controller
 
         if (!LoginHelper.IsAdmin(HttpContext))
         {
-            var userBoards = tableroRepository.ListUserBoards(LoginHelper.GetUserId(HttpContext));
+            var userBoards = tableroRepository.ListUserBoards(int.Parse(LoginHelper.GetUserId(HttpContext)));
             var foundBoard = userBoards.Find(board => board.Id == id);
             if (foundBoard != null) return View(board);
             else return NotFound($"No existe el tablero con ID {id}");
@@ -136,11 +148,11 @@ public class TableroController : Controller
 
         if (!LoginHelper.IsAdmin(HttpContext))
         {
-            var userBoards = tableroRepository.ListUserBoards(LoginHelper.GetUserId(HttpContext));
+            var userBoards = tableroRepository.ListUserBoards(int.Parse(LoginHelper.GetUserId(HttpContext)));
             var foundBoard = userBoards.Find(board => board.Id == id);
             if (foundBoard != null)
             {
-                newBoard.IdUsuarioPropietario = LoginHelper.GetUserId(HttpContext);
+                newBoard.IdUsuarioPropietario = int.Parse(LoginHelper.GetUserId(HttpContext));
                 tableroRepository.Update(id, newBoard);
 
                 return RedirectToAction("Index");

@@ -1,5 +1,5 @@
-@using kanban.Models
-@model Tablero
+@using kanban.ViewModels
+@model CrearTableroViewModel
 
 <form asp-controller="Tablero" asp-action="Crear" method="post">
     <div class="mb-3">
@@ -13,16 +13,14 @@
     </div>
 
 
-    @if (ViewBag.EsAdmin)
+    @if (Model.IsAdmin)
     {
         <div class="mb-3">
-            <label for="lbl.idUsuarioPropietario" class="form-label" asp-for="IdUsuarioPropietario">ID Usuario Propietario:
+            <label for="lbl.IdUsuarioPropietario" class="form-label" asp-for="IdUsuarioPropietario">ID Usuario Propietario:
             </label>
-            <input type="number" class="form-control" id="lbl.idUsuarioPropietario" asp-for="IdUsuarioPropietario">
+            <input type="number" class="form-control" id="lbl.IdUsuarioPropietario" asp-for="IdUsuarioPropietario">
         </div>
     }
-
-
 
     <button type="submit" class="btn btn-primary">Crear</button>
 </form>

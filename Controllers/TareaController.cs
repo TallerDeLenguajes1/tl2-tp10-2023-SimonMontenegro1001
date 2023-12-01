@@ -1,6 +1,6 @@
 using kanban.Models;
 using kanban.Repository;
-using kanban.Controllers.helpers;
+using kanban.Controllers.Helpers;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -126,7 +126,7 @@ public class TareaController : Controller
 
         if (!LoginHelper.IsAdmin(HttpContext))
         {
-            var UserBoards = tableroRepository.ListUserBoards(LoginHelper.GetUserId(HttpContext));
+            var UserBoards = tableroRepository.ListUserBoards(int.Parse(LoginHelper.GetUserId(HttpContext)));
             var FoundBoard = UserBoards.Find(board => board.Id == id);
             if (FoundBoard == null) return NotFound($"No existe el tablero de Id {id}");
         }

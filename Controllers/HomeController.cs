@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
-using kanban.Controllers.helpers;
+using kanban.Controllers.Helpers;
 using Microsoft.AspNetCore.Mvc;
-using tp10.Models;
+using kanban.Models;
 
-namespace tp10.Controllers;
+namespace kanban.Controllers;
 
 public class HomeController : Controller
 {
