@@ -13,11 +13,14 @@
     </div>
 
 
-    <div class="mb-3">
-        <label for="lbl.idUsuarioPropietario" class="form-label" asp-for="IdUsuarioPropietario">ID Usuario Propietario:
-        </label>
-        <input type="number" class="form-control" id="lbl.idUsuarioPropietario" asp-for="IdUsuarioPropietario">
-    </div>
+    @if (ViewBag.EsAdmin)
+    {
+        <div class="mb-3">
+            <label for="lbl.idUsuarioPropietario" class="form-label" asp-for="IdUsuarioPropietario">ID Usuario Propietario:
+            </label>
+            <input type="number" class="form-control" id="lbl.idUsuarioPropietario" asp-for="IdUsuarioPropietario">
+        </div>
+    }
 
 
 

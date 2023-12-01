@@ -12,12 +12,14 @@ namespace kanban.Controllers;
 public class TareaController : Controller
 {
     private readonly ITareaRepository tareaRepository;
+    private readonly ITableroRepository tableroRepository;
     private readonly ILogger<TareaController> _logger;
 
     public TareaController(ILogger<TareaController> logger)
     {
         _logger = logger;
         tareaRepository = new TareaRepository();
+        tableroRepository = new TableroRepository();
     }
 
     [HttpPost("crear/{boardId}")]
@@ -42,7 +44,6 @@ public class TareaController : Controller
                 IdTablero = tableroId
             };
             return View(tarea);
-
         }
         return RedirectToAction("Index", "Login");
     }
@@ -108,7 +109,6 @@ public class TareaController : Controller
     {
         if (LoginHelper.IsLogged(HttpContext))
         {
-
             var tareas = tareaRepository.ListByUser(id);
 
             return View(tareas);
@@ -119,13 +119,20 @@ public class TareaController : Controller
     [HttpGet("tablero/{id}")]
     public IActionResult ListByBoard(int id)
     {
-        if (LoginHelper.IsLogged(HttpContext))
+        if (!LoginHelper.IsLogged(HttpContext)) return RedirectToAction("Index", "Login");
+
+
+        ViewBag.EsAdmin = LoginHelper.IsAdmin(HttpContext);
+
+        if (!LoginHelper.IsAdmin(HttpContext))
         {
-
-            var tareas = tareaRepository.ListByBoard(id);
-
-            return View(tareas);
+            var UserBoards = tableroRepository.ListUserBoards(LoginHelper.GetUserId(HttpContext));
+            var FoundBoard = UserBoards.Find(board => board.Id == id);
+            if (FoundBoard == null) return NotFound($"No existe el tablero de Id {id}");
         }
-        return RedirectToAction("Index", "Login");
+
+        var tareas = tareaRepository.ListByBoard(id);
+
+        return View(tareas);
     }
 }

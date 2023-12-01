@@ -12,7 +12,11 @@
     <thead>
         <tr>
             <th hidden>ID</th>
-            <th>Usuario Propietario</th>
+
+            @if (ViewBag.EsAdmin)
+            {
+                <th>Usuario Propietario</th>
+            }
             <th>Nombre</th>
             <th>Descripcion</th>
             <th></th>
@@ -26,7 +30,10 @@
         {
             <tr>
                 <td hidden>@tablero.Id</td>
-                <td>@tablero.IdUsuarioPropietario</td>
+                @if (ViewBag.EsAdmin)
+                {
+                    <td>@tablero.IdUsuarioPropietario</td>
+                }
                 <td>@tablero.Nombre</td>
                 <td>@tablero.Descripcion</td>
                 <td>
