@@ -63,10 +63,19 @@ public class TableroController : Controller
 
         ViewBag.EsAdmin = LoginHelper.IsAdmin(HttpContext);
 
-        if (LoginHelper.IsAdmin(HttpContext)) boards = tableroRepository.List();
+        if (ViewBag.EsAdmin) boards = tableroRepository.List();
+
         else boards = tableroRepository.ListUserBoards(int.Parse(LoginHelper.GetUserId(HttpContext)));
 
-        return View(boards);
+        List<ListarTablerosViewModel> ListarTablerosModel = new();
+
+        foreach (var board in boards)
+        {
+            ListarTablerosViewModel modelo = new(board.Nombre, board.Descripcion, board.Id, board.IdUsuarioPropietario);
+            ListarTablerosModel.Add(modelo);
+        }
+
+        return View(ListarTablerosModel);
     }
 
     [HttpPost("eliminar/{id}")]
@@ -120,6 +129,13 @@ public class TableroController : Controller
 
         var board = tableroRepository.GetById(id);
 
+        var modificarTableroModel = new ModificarTableroViewModel
+        {
+            Nombre = board.Nombre,
+            Descripcion = board.Descripcion,
+            Id = board.Id
+        };
+
         if (board.Id == 0) return NotFound($"No existe el tablero con ID {id}");
 
         ViewBag.EsAdmin = LoginHelper.IsAdmin(HttpContext);
@@ -128,16 +144,20 @@ public class TableroController : Controller
         {
             var userBoards = tableroRepository.ListUserBoards(int.Parse(LoginHelper.GetUserId(HttpContext)));
             var foundBoard = userBoards.Find(board => board.Id == id);
-            if (foundBoard != null) return View(board);
+            if (foundBoard != null) return View(modificarTableroModel);
             else return NotFound($"No existe el tablero con ID {id}");
         }
+        else
+        {
+            modificarTableroModel.IdUsuarioPropietario = board.IdUsuarioPropietario;
+        }
 
-        return View(board);
+        return View(modificarTableroModel);
 
     }
 
     [HttpPost("editar/{id}")]
-    public IActionResult Editar(int id, [FromForm] Tablero newBoard)
+    public IActionResult Editar(int id, [FromForm] ModificarTableroViewModel newBoardViewModel)
     {
 
         if (!LoginHelper.IsLogged(HttpContext)) return RedirectToAction("Index", "Login");
@@ -145,6 +165,16 @@ public class TableroController : Controller
         var board = tableroRepository.GetById(id);
 
         if (board.Id == 0) return NotFound($"No existe el tablero con ID {id}");
+
+        var newBoard = new Tablero
+        {
+            Nombre = newBoardViewModel.Nombre,
+            Descripcion = newBoardViewModel.Descripcion,
+            Id = newBoardViewModel.Id,
+            IdUsuarioPropietario = newBoardViewModel.IdUsuarioPropietario == 0
+            ? board.IdUsuarioPropietario
+            : newBoardViewModel.IdUsuarioPropietario
+        };
 
         if (!LoginHelper.IsAdmin(HttpContext))
         {

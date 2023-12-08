@@ -1,1 +1,10 @@
-"# tl2-tp10-2023-SimonMontenegro1001" 
+TAREAS TP11
+
+- Crear e implementar viewModels en controladores y vistas 
+
+🟢 login
+🟢 Tablero
+🟢 Tarea  
+🟢 Usuario
+
+

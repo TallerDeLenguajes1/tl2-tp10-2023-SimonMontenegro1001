@@ -1,7 +1,10 @@
 using kanban.Models;
+using kanban.ViewModels;
 using kanban.Repository;
 using kanban.Controllers.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using System.CodeDom;
+
 
 
 namespace kanban.Controllers;
@@ -23,10 +26,20 @@ public class TareaController : Controller
     }
 
     [HttpPost("crear/{boardId}")]
-    public IActionResult Crear(int boardId, [FromForm] Tarea task)
+    public IActionResult Crear(int boardId, [FromForm] CrearTareaViewModel tareaViewModel)
     {
         if (LoginHelper.IsLogged(HttpContext))
         {
+            var task = new Tarea
+            {
+                Id = tareaViewModel.Id,
+                IdTablero = tareaViewModel.IdTablero,
+                Nombre = tareaViewModel.Nombre,
+                Descripcion = tareaViewModel.Descripcion,
+                Estado = tareaViewModel.Estado,
+                Color = tareaViewModel.Color,
+                IdUsuarioAsignado = tareaViewModel.IdUsuarioAsignado
+            };
             tareaRepository.Create(boardId, task);
             return RedirectToAction("ListByBoard", new { id = boardId });
 
@@ -43,7 +56,18 @@ public class TareaController : Controller
             {
                 IdTablero = tableroId
             };
-            return View(tarea);
+
+            var crearTareaModel = new CrearTareaViewModel
+            {
+                Id = tarea.Id,
+                IdTablero = tarea.IdTablero,
+                Nombre = tarea.Nombre,
+                Descripcion = tarea.Descripcion,
+                Estado = tarea.Estado,
+                Color = tarea.Color,
+                IdUsuarioAsignado = tarea.IdUsuarioAsignado
+            };
+            return View(crearTareaModel);
         }
         return RedirectToAction("Index", "Login");
     }
@@ -60,14 +84,23 @@ public class TareaController : Controller
             {
                 return NotFound($"No se encontró la tarea con ID {id}");
             }
-
-            return View(tarea);
+            var editarTareaModel = new ModificarTareaViewModel
+            {
+                Id = tarea.Id,
+                IdTablero = tarea.IdTablero,
+                Estado = tarea.Estado,
+                Nombre = tarea.Nombre,
+                Descripcion = tarea.Descripcion,
+                Color = tarea.Color,
+                IdUsuarioAsignado = tarea.IdUsuarioAsignado,
+            };
+            return View(editarTareaModel);
         }
         return RedirectToAction("Index", "Login");
     }
 
     [HttpPost("editar/{id}")]
-    public IActionResult Editar(int id, [FromForm] Tarea tarea)
+    public IActionResult Editar(int id, [FromForm] ModificarTareaViewModel tareaViewModel)
     {
         if (LoginHelper.IsLogged(HttpContext))
         {
@@ -78,6 +111,16 @@ public class TareaController : Controller
             {
                 return NotFound($"No se encontró la tarea con ID {id}");
             }
+            var tarea = new Tarea
+            {
+                Id = tareaViewModel.Id,
+                IdTablero = tareaViewModel.IdTablero,
+                Estado = tareaViewModel.Estado,
+                Nombre = tareaViewModel.Nombre,
+                Descripcion = tareaViewModel.Descripcion,
+                Color = tareaViewModel.Color,
+                IdUsuarioAsignado = tareaViewModel.IdUsuarioAsignado,
+            };
 
             tareaRepository.Update(id, tarea);
             return RedirectToAction("ListByBoard", new { id = task.IdTablero });
@@ -110,8 +153,20 @@ public class TareaController : Controller
         if (LoginHelper.IsLogged(HttpContext))
         {
             var tareas = tareaRepository.ListByUser(id);
-
-            return View(tareas);
+            var listaTareasModel = new List<ListarTareasViewModel>();
+            foreach (var tarea in tareas)
+            {
+                var listarTareasModel = new ListarTareasViewModel
+                {
+                    Id = tarea.Id,
+                    IdTablero = tarea.IdTablero,
+                    Nombre = tarea.Nombre,
+                    Descripcion = tarea.Descripcion,
+                    Estado = tarea.Estado,
+                };
+                listaTareasModel.Add(listarTareasModel);
+            }
+            return View(listaTareasModel);
         }
         return RedirectToAction("Index", "Login");
     }
@@ -132,7 +187,20 @@ public class TareaController : Controller
         }
 
         var tareas = tareaRepository.ListByBoard(id);
+        var listaTareasModel = new List<ListarTareasViewModel>();
+        foreach (var tarea in tareas)
+        {
+            var listarTareasModel = new ListarTareasViewModel
+            {
+                Id = tarea.Id,
+                IdTablero = tarea.IdTablero,
+                Nombre = tarea.Nombre,
+                Descripcion = tarea.Descripcion,
+                Estado = tarea.Estado,
+            };
+            listaTareasModel.Add(listarTareasModel);
+        }
 
-        return View(tareas);
+        return View(listaTareasModel);
     }
 }

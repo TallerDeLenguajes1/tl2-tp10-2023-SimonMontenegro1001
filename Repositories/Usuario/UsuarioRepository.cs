@@ -8,12 +8,13 @@ public class UsuarioRepository : IUsuarioRepository
     private readonly string connectionString = "Data Source=DB/kanban.db;Cache=Shared";
     public void Create(Usuario user)
     {
-        var query = $"INSERT INTO usuario (nombre_de_usuario,rol) VALUES (@username,@rol)";
+        var query = $"INSERT INTO usuario (nombre_de_usuario,contrasena,rol) VALUES (@username,@contrasena,@rol)";
         using var connection = new SQLiteConnection(connectionString);
         connection.Open();
         var command = new SQLiteCommand(query, connection);
 
         command.Parameters.Add(new SQLiteParameter("@username", user.NombreDeUsuario));
+        command.Parameters.Add(new SQLiteParameter("@contrasena", user.Contrasena));
         command.Parameters.Add(new SQLiteParameter("@rol", user.Rol));
 
         command.ExecuteNonQuery();
@@ -86,8 +87,10 @@ public class UsuarioRepository : IUsuarioRepository
         using var connection = new SQLiteConnection(connectionString);
         connection.Open();
         using var command = connection.CreateCommand();
-        command.CommandText = "UPDATE usuario SET nombre_de_usuario = @username WHERE id = @userId";
+        command.CommandText = "UPDATE usuario SET nombre_de_usuario = @username, contrasena = @contrasena, rol = @rol WHERE id = @userId";
         command.Parameters.Add(new SQLiteParameter("@username", user.NombreDeUsuario));
+        command.Parameters.Add(new SQLiteParameter("@contrasena", user.Contrasena));
+        command.Parameters.Add(new SQLiteParameter("@rol", user.Rol));
         command.Parameters.Add(new SQLiteParameter("@userId", userId));
         command.ExecuteNonQuery();
     }

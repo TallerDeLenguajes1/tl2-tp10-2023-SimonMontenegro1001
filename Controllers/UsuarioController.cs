@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using kanban.Repository;
 using kanban.Controllers.Helpers;
 using kanban.Models;
+using kanban.ViewModels;
 
 namespace kanban.Controllers;
 
@@ -19,8 +20,14 @@ public class UsuarioController : Controller
     }
 
     [HttpPost("crear")]
-    public IActionResult Crear([FromForm] Usuario user)
+    public IActionResult Crear([FromForm] CrearUsuarioViewModel crearUsuarioModel)
     {
+        var user = new Usuario
+        {
+            NombreDeUsuario = crearUsuarioModel.NombreDeUsuario,
+            Contrasena = crearUsuarioModel.Contrasena,
+            Rol = crearUsuarioModel.Rol
+        };
         usuarioRepository.Create(user);
         return RedirectToAction("Index");
     }
@@ -30,8 +37,7 @@ public class UsuarioController : Controller
     {
         if (LoginHelper.IsLogged(HttpContext))
         {
-
-            return View(new Usuario());
+            return View(new CrearUsuarioViewModel());
         }
         return RedirectToAction("Index", "Login");
     }
@@ -41,10 +47,21 @@ public class UsuarioController : Controller
     {
         if (LoginHelper.IsLogged(HttpContext))
         {
-
             List<Usuario> users = usuarioRepository.List();
 
-            return View(users);
+            List<ListarUsuariosViewModel> ListaUsuariosModel = new();
+
+            foreach (var user in users)
+            {
+                var newUser = new ListarUsuariosViewModel
+                {
+                    NombreDeUsuario = user.NombreDeUsuario,
+                    Id = user.Id
+                };
+                ListaUsuariosModel.Add(newUser);
+            }
+
+            return View(ListaUsuariosModel);
         }
         return RedirectToAction("Index", "Login");
     }
@@ -78,13 +95,20 @@ public class UsuarioController : Controller
             {
                 return NotFound($"No se encontró el usuario con ID {id}");
             }
-            return View(board);
+            var modificarUsuarioModel = new ModificarUsuarioViewModel
+            {
+                Id = board.Id,
+                NombreDeUsuario = board.NombreDeUsuario,
+                Contrasena = board.Contrasena,
+                Rol = board.Rol,
+            };
+            return View(modificarUsuarioModel);
         }
         return RedirectToAction("Index", "Login");
     }
 
     [HttpPost("editar/{id}")]
-    public IActionResult Editar(int id, [FromForm] Usuario newUser)
+    public IActionResult Editar(int id, [FromForm] ModificarUsuarioViewModel modificarUsuarioModel)
     {
         if (LoginHelper.IsLogged(HttpContext))
         {
@@ -95,6 +119,14 @@ public class UsuarioController : Controller
             {
                 return NotFound($"No se encontró el tablero con ID {id}");
             }
+
+            var newUser = new Usuario
+            {
+                Id = modificarUsuarioModel.Id,
+                NombreDeUsuario = modificarUsuarioModel.NombreDeUsuario,
+                Contrasena = modificarUsuarioModel.Contrasena,
+                Rol = modificarUsuarioModel.Rol,
+            };
 
             usuarioRepository.Update(id, newUser);
 

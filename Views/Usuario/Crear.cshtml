@@ -1,10 +1,18 @@
-@using kanban.Models
-@model Usuario
+@using kanban.ViewModels
+@model CrearUsuarioViewModel
 
 <form asp-controller="Usuario" asp-action="Crear" method="post">
     <div class="mb-3">
         <label for="lbl.NombreDeUsuario" class="form-label" asp-for="NombreDeUsuario">Nombre: </label>
         <input type="text" class="form-control" id="lbl.NombreDeUsuario" asp-for="NombreDeUsuario">
+    </div>
+    <div class="mb-3">
+        <label for="lbl.Contrasena" class="form-label" asp-for="Contrasena">Contraseña: </label>
+        <input type="text" class="form-control" id="lbl.Contrasena" asp-for="Contrasena">
+    </div>
+    <div class="mb-3">
+        <label for="lbl.Rol" class="form-label" asp-for="Rol">Rol: </label>
+        <input type="text" class="form-control" id="lbl.Rol" asp-for="Rol">
     </div>
 
     <button type="submit" class="btn btn-primary">Crear</button>
