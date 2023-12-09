@@ -10,15 +10,15 @@ namespace kanban.Controllers;
 [Route("tableros")]
 public class TableroController : Controller
 {
-    private readonly ITableroRepository tableroRepository;
-    private readonly ITareaRepository tareaRepository;
+    private readonly ITableroRepository _tableroRepository;
+    private readonly ITareaRepository _tareaRepository;
     private readonly ILogger<TableroController> _logger;
 
-    public TableroController(ILogger<TableroController> logger)
+    public TableroController(ILogger<TableroController> logger, ITableroRepository tableroRepository, ITareaRepository tareaRepository)
     {
         _logger = logger;
-        tableroRepository = new TableroRepository();
-        tareaRepository = new TareaRepository();
+        _tableroRepository = tableroRepository;
+        _tareaRepository = tareaRepository;
     }
 
     [HttpGet("crear")]
@@ -38,6 +38,7 @@ public class TableroController : Controller
 
         if (!LoginHelper.IsLogged(HttpContext)) return RedirectToAction("Index", "Login");
 
+        if (!ModelState.IsValid) return RedirectToAction("Index", "Home");
         var tablero = new Tablero()
         {
             Nombre = crearTableroModel.Nombre,
@@ -49,7 +50,7 @@ public class TableroController : Controller
             tablero.IdUsuarioPropietario = int.Parse(LoginHelper.GetUserId(HttpContext));
         }
 
-        tableroRepository.Create(tablero);
+        _tableroRepository.Create(tablero);
 
         return RedirectToAction("Index");
     }
@@ -63,9 +64,9 @@ public class TableroController : Controller
 
         ViewBag.EsAdmin = LoginHelper.IsAdmin(HttpContext);
 
-        if (ViewBag.EsAdmin) boards = tableroRepository.List();
+        if (ViewBag.EsAdmin) boards = _tableroRepository.List();
 
-        else boards = tableroRepository.ListUserBoards(int.Parse(LoginHelper.GetUserId(HttpContext)));
+        else boards = _tableroRepository.ListUserBoards(int.Parse(LoginHelper.GetUserId(HttpContext)));
 
         List<ListarTablerosViewModel> ListarTablerosModel = new();
 
@@ -84,24 +85,24 @@ public class TableroController : Controller
 
         if (!LoginHelper.IsLogged(HttpContext)) return RedirectToAction("Index", "Login");
 
-        var board = tableroRepository.GetById(id);
+        var board = _tableroRepository.GetById(id);
 
         if (board.Id == 0) return NotFound($"No existe el tablero con ID {id}");
 
         if (!LoginHelper.IsAdmin(HttpContext))
         {
-            var userBoards = tableroRepository.ListUserBoards(int.Parse(LoginHelper.GetUserId(HttpContext)));
+            var userBoards = _tableroRepository.ListUserBoards(int.Parse(LoginHelper.GetUserId(HttpContext)));
             var foundBoard = userBoards.Find(board => board.Id == id);
             if (foundBoard != null)
             {
-                var tasks = tareaRepository.ListByBoard(id);
+                var tasks = _tareaRepository.ListByBoard(id);
 
                 foreach (var task in tasks)
                 {
-                    tareaRepository.Delete(task.Id);
+                    _tareaRepository.Delete(task.Id);
                 }
 
-                tableroRepository.Delete(id);
+                _tableroRepository.Delete(id);
             }
             else
             {
@@ -109,14 +110,14 @@ public class TableroController : Controller
             }
         }
 
-        var tasksToDelete = tareaRepository.ListByBoard(id);
+        var tasksToDelete = _tareaRepository.ListByBoard(id);
 
         foreach (var task in tasksToDelete)
         {
-            tareaRepository.Delete(task.Id);
+            _tareaRepository.Delete(task.Id);
         }
 
-        tableroRepository.Delete(id);
+        _tableroRepository.Delete(id);
 
         return RedirectToAction("Index");
     }
@@ -127,7 +128,7 @@ public class TableroController : Controller
 
         if (!LoginHelper.IsLogged(HttpContext)) return RedirectToAction("Index", "Login");
 
-        var board = tableroRepository.GetById(id);
+        var board = _tableroRepository.GetById(id);
 
         var modificarTableroModel = new ModificarTableroViewModel
         {
@@ -142,7 +143,7 @@ public class TableroController : Controller
 
         if (!LoginHelper.IsAdmin(HttpContext))
         {
-            var userBoards = tableroRepository.ListUserBoards(int.Parse(LoginHelper.GetUserId(HttpContext)));
+            var userBoards = _tableroRepository.ListUserBoards(int.Parse(LoginHelper.GetUserId(HttpContext)));
             var foundBoard = userBoards.Find(board => board.Id == id);
             if (foundBoard != null) return View(modificarTableroModel);
             else return NotFound($"No existe el tablero con ID {id}");
@@ -162,7 +163,8 @@ public class TableroController : Controller
 
         if (!LoginHelper.IsLogged(HttpContext)) return RedirectToAction("Index", "Login");
 
-        var board = tableroRepository.GetById(id);
+        if (!ModelState.IsValid) return RedirectToAction("Index", "Home");
+        var board = _tableroRepository.GetById(id);
 
         if (board.Id == 0) return NotFound($"No existe el tablero con ID {id}");
 
@@ -178,12 +180,12 @@ public class TableroController : Controller
 
         if (!LoginHelper.IsAdmin(HttpContext))
         {
-            var userBoards = tableroRepository.ListUserBoards(int.Parse(LoginHelper.GetUserId(HttpContext)));
+            var userBoards = _tableroRepository.ListUserBoards(int.Parse(LoginHelper.GetUserId(HttpContext)));
             var foundBoard = userBoards.Find(board => board.Id == id);
             if (foundBoard != null)
             {
                 newBoard.IdUsuarioPropietario = int.Parse(LoginHelper.GetUserId(HttpContext));
-                tableroRepository.Update(id, newBoard);
+                _tableroRepository.Update(id, newBoard);
 
                 return RedirectToAction("Index");
             }
@@ -192,7 +194,7 @@ public class TableroController : Controller
                 return NotFound($"No existe el tablero con ID {id}");
             }
         }
-        tableroRepository.Update(id, newBoard);
+        _tableroRepository.Update(id, newBoard);
 
         return RedirectToAction("Index");
     }
