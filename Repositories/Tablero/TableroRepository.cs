@@ -1,153 +1,197 @@
 using System.Data.SQLite;
 using kanban.Models;
 
-namespace kanban.Repository;
-
-public class TableroRepository : ITableroRepository
+namespace kanban.Repository
 {
-    private readonly string connectionString = "Data Source=DB/kanban.db;Cache=Shared";
-
-    public Tablero Create(Tablero board)
+    public class TableroRepository : ITableroRepository
     {
-        var queryString = @"INSERT INTO tablero (id_usuario_propietario, nombre, descripcion) VALUES (@ownerUserId, @name, @description);";
+        private readonly string? _connectionString;
 
-        using var connection = new SQLiteConnection(connectionString);
-        connection.Open();
-
-        var command = new SQLiteCommand(queryString, connection);
-
-        command.Parameters.Add(new SQLiteParameter("@ownerUserId", board.IdUsuarioPropietario));
-        command.Parameters.Add(new SQLiteParameter("@name", board.Nombre));
-        command.Parameters.Add(new SQLiteParameter("@description", board.Descripcion));
-
-        command.ExecuteNonQuery();
-        connection.Close();
-
-        // wtf xd
-
-        return board;
-    }
-
-    public void Delete(int boardId)
-    {
-        var queryString = @"DELETE FROM tablero WHERE id = @boardId;";
-
-        using (SQLiteConnection connection = new(connectionString))
+        public TableroRepository(string connectionString)
         {
-            connection.Open();
+            _connectionString = connectionString;
+        }
 
-            using (var command = new SQLiteCommand(queryString, connection))
+        public Tablero Create(Tablero nuevoTablero)
+        {
+            try
             {
-                command.Parameters.Add(new SQLiteParameter("@boardId", boardId));
+                var query = @"INSERT INTO tablero (id_usuario_propietario, nombre, descripcion) VALUES (@idUsuarioPropietario, @nombre, @descripcion);";
+
+                using var connection = new SQLiteConnection(_connectionString);
+                connection.Open();
+
+                using var command = new SQLiteCommand(query, connection);
+
+                command.Parameters.Add(new SQLiteParameter("@idUsuarioPropietario", nuevoTablero.IdUsuarioPropietario));
+                command.Parameters.Add(new SQLiteParameter("@nombre", nuevoTablero.Nombre));
+                command.Parameters.Add(new SQLiteParameter("@descripcion", nuevoTablero.Descripcion));
 
                 command.ExecuteNonQuery();
+                connection.Close();
+
+                return nuevoTablero;
             }
-
-            connection.Close();
-        }
-    }
-
-    public Tablero GetById(int boardId)
-    {
-        var queryString = @"SELECT * FROM tablero WHERE id = @boardId;";
-        var board = new Tablero();
-
-        using (var connection = new SQLiteConnection(connectionString))
-        {
-            SQLiteCommand command = new SQLiteCommand(queryString, connection);
-            command.Parameters.Add(new SQLiteParameter("boardId", boardId));
-            connection.Open();
-
-            using (SQLiteDataReader reader = command.ExecuteReader())
+            catch (Exception ex)
             {
-                while (reader.Read())
-                {
-                    board.Id = Convert.ToInt32(reader["id"]);
-                    board.Nombre = reader["nombre"].ToString();
-                    board.Descripcion = reader["descripcion"].ToString();
-                    board.IdUsuarioPropietario = Convert.ToInt32(reader["id_usuario_propietario"]);
-                }
+                throw new Exception("Error al crear el tablero.", ex);
             }
-            connection.Close();
         }
-        return board;
-    }
 
-    public List<Tablero> List()
-    {
-        var queryString = @"SELECT * FROM tablero;";
-        var boards = new List<Tablero>();
-
-        using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+        public void Delete(int idTablero)
         {
-            SQLiteCommand command = new SQLiteCommand(queryString, connection);
-            connection.Open();
-
-            using (SQLiteDataReader reader = command.ExecuteReader())
+            try
             {
-                while (reader.Read())
+                var query = @"DELETE FROM tablero WHERE id = @idTablero;";
+
+                using (SQLiteConnection connection = new(_connectionString))
                 {
-                    Tablero tablero = new Tablero()
+                    connection.Open();
+
+                    using (var command = new SQLiteCommand(query, connection))
                     {
-                        Id = Convert.ToInt32(reader["id"]),
-                        Nombre = reader["nombre"].ToString(),
-                        Descripcion = reader["descripcion"].ToString(),
-                        IdUsuarioPropietario = Convert.ToInt32(reader["id_usuario_propietario"])
+                        command.Parameters.Add(new SQLiteParameter("@idTablero", idTablero));
 
-                    };
-                    boards.Add(tablero);
+                        command.ExecuteNonQuery();
+                    }
+
+                    connection.Close();
                 }
             }
-            connection.Close();
-        }
-        return boards;
-    }
-
-    public List<Tablero> ListUserBoards(int userId)
-    {
-        var queryString = @"SELECT * FROM tablero WHERE id_usuario_propietario = @userId;";
-        var boards = new List<Tablero>();
-
-        using (var connection = new SQLiteConnection(connectionString))
-        {
-            var command = new SQLiteCommand(queryString, connection);
-            command.Parameters.Add(new SQLiteParameter("userId", userId));
-            connection.Open();
-
-            using (SQLiteDataReader reader = command.ExecuteReader())
+            catch (Exception ex)
             {
-                while (reader.Read())
-                {
-                    var board = new Tablero()
-                    {
-                        Id = Convert.ToInt32(reader["id"]),
-                        Nombre = reader["nombre"].ToString(),
-                        Descripcion = reader["descripcion"].ToString(),
-                        IdUsuarioPropietario = Convert.ToInt32(reader["id_usuario_propietario"])
-                    };
-                    boards.Add(board);
-
-                }
+                throw new Exception("Error al eliminar el tablero.", ex);
             }
-            connection.Close();
         }
-        return boards;
-    }
 
-    public void Update(int boardId, Tablero board)
-    {
-        var queryString = @"UPDATE Tablero SET nombre = @name, descripcion = @description, id_usuario_propietario = @ownerUserId WHERE id = @boardId;";
+        public Tablero GetById(int idTablero)
+        {
+            try
+            {
+                var query = @"SELECT * FROM tablero WHERE id = @idTablero;";
+                var board = new Tablero();
 
-        using var connection = new SQLiteConnection(connectionString);
-        SQLiteCommand command = new SQLiteCommand(queryString, connection);
-        connection.Open();
+                using (var connection = new SQLiteConnection(_connectionString))
+                {
+                    SQLiteCommand command = new(query, connection);
+                    command.Parameters.Add(new SQLiteParameter("@idTablero", idTablero));
+                    connection.Open();
 
-        command.Parameters.Add(new SQLiteParameter("@name", board.Nombre));
-        command.Parameters.Add(new SQLiteParameter("@description", board.Descripcion));
-        command.Parameters.Add(new SQLiteParameter("@ownerUserId", board.IdUsuarioPropietario));
-        command.Parameters.Add(new SQLiteParameter("@boardId", boardId));
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            board.Id = Convert.ToInt32(reader["id"]);
+                            board.Nombre = reader["nombre"].ToString();
+                            board.Descripcion = reader["descripcion"].ToString();
+                            board.IdUsuarioPropietario = Convert.ToInt32(reader["id_usuario_propietario"]);
+                        }
+                    }
+                    connection.Close();
+                }
+                return board;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener el tablero.", ex);
+            }
+        }
 
-        command.ExecuteNonQuery();
-        connection.Close();
+        public List<Tablero> List()
+        {
+            try
+            {
+                var query = @"SELECT * FROM tablero;";
+                var boards = new List<Tablero>();
+
+                using (SQLiteConnection connection = new(_connectionString))
+                {
+                    SQLiteCommand comando = new(query, connection);
+                    connection.Open();
+
+                    using (SQLiteDataReader reader = comando.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Tablero board = new()
+                            {
+                                Id = Convert.ToInt32(reader["id"]),
+                                Nombre = reader["nombre"].ToString(),
+                                Descripcion = reader["descripcion"].ToString(),
+                                IdUsuarioPropietario = Convert.ToInt32(reader["id_usuario_propietario"])
+                            };
+                            boards.Add(board);
+                        }
+                    }
+                    connection.Close();
+                }
+                return boards;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener la lista de tableros.", ex);
+            }
+        }
+
+        public List<Tablero> ListUserBoards(int idUsuario)
+        {
+            try
+            {
+                var query = @"SELECT * FROM tablero WHERE id_usuario_propietario = @idUsuario;";
+                var boards = new List<Tablero>();
+
+                using (var connection = new SQLiteConnection(_connectionString))
+                {
+                    var comando = new SQLiteCommand(query, connection);
+                    comando.Parameters.Add(new SQLiteParameter("@idUsuario", idUsuario));
+                    connection.Open();
+
+                    using (SQLiteDataReader reader = comando.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var board = new Tablero()
+                            {
+                                Id = Convert.ToInt32(reader["id"]),
+                                Nombre = reader["nombre"].ToString(),
+                                Descripcion = reader["descripcion"].ToString(),
+                                IdUsuarioPropietario = Convert.ToInt32(reader["id_usuario_propietario"])
+                            };
+                            boards.Add(board);
+                        }
+                    }
+                    connection.Close();
+                }
+                return boards;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener la lista de tableros de usuario.", ex);
+            }
+        }
+
+        public void Update(int idTablero, Tablero tablero)
+        {
+            try
+            {
+                var query = @"UPDATE tablero SET nombre = @nombre, descripcion = @descripcion, id_usuario_propietario = @idUsuarioPropietario WHERE id = @idTablero;";
+
+                using var conexion = new SQLiteConnection(_connectionString);
+                SQLiteCommand command = new(query, conexion);
+                conexion.Open();
+
+                command.Parameters.Add(new SQLiteParameter("@nombre", tablero.Nombre));
+                command.Parameters.Add(new SQLiteParameter("@descripcion", tablero.Descripcion));
+                command.Parameters.Add(new SQLiteParameter("@idUsuarioPropietario", tablero.IdUsuarioPropietario));
+                command.Parameters.Add(new SQLiteParameter("@idTablero", idTablero));
+
+                command.ExecuteNonQuery();
+                conexion.Close();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al actualizar el tablero.", ex);
+            }
+        }
     }
 }

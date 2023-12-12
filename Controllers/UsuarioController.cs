@@ -3,134 +3,185 @@ using kanban.Repository;
 using kanban.Controllers.Helpers;
 using kanban.Models;
 using kanban.ViewModels;
+using System.Diagnostics;
 
-namespace kanban.Controllers;
-
-[ApiController]
-[Route("usuarios")]
-public class UsuarioController : Controller
+namespace kanban.Controllers
 {
-    private readonly IUsuarioRepository _usuarioRepository;
-    private readonly ILogger<UsuarioController> _logger;
-
-    public UsuarioController(ILogger<UsuarioController> logger, IUsuarioRepository usuarioRepository)
+    [ApiController]
+    [Route("usuarios")]
+    public class UsuarioController : Controller
     {
-        _logger = logger;
-        _usuarioRepository = usuarioRepository;
-    }
+        private readonly IUsuarioRepository _usuarioRepository;
+        private readonly ILogger<UsuarioController> _logger;
 
-    [HttpPost("crear")]
-    public IActionResult Crear([FromForm] CrearUsuarioViewModel crearUsuarioModel)
-    {
-        if (!ModelState.IsValid) return RedirectToAction("Index", "Home");
-        var user = new Usuario
+        public UsuarioController(ILogger<UsuarioController> logger, IUsuarioRepository usuarioRepository)
         {
-            NombreDeUsuario = crearUsuarioModel.NombreDeUsuario,
-            Contrasena = crearUsuarioModel.Contrasena,
-            Rol = crearUsuarioModel.Rol
-        };
-        _usuarioRepository.Create(user);
-        return RedirectToAction("Index");
-    }
-
-    [HttpGet("crear")]
-    public IActionResult Crear()
-    {
-        if (LoginHelper.IsLogged(HttpContext))
-        {
-            return View(new CrearUsuarioViewModel());
+            _logger = logger;
+            _usuarioRepository = usuarioRepository;
         }
-        return RedirectToAction("Index", "Login");
-    }
 
-    [HttpGet]
-    public IActionResult Index()
-    {
-        if (LoginHelper.IsLogged(HttpContext))
+        [HttpPost("crear")]
+        public IActionResult Crear([FromForm] CrearUsuarioViewModel crearUsuarioModel)
         {
-            List<Usuario> users = _usuarioRepository.List();
-
-            List<ListarUsuariosViewModel> ListaUsuariosModel = new();
-
-            foreach (var user in users)
+            try
             {
-                var newUser = new ListarUsuariosViewModel
+                if (!ModelState.IsValid) return RedirectToAction("Index", "Home");
+                var user = new Usuario
                 {
-                    NombreDeUsuario = user.NombreDeUsuario,
-                    Id = user.Id
+                    NombreDeUsuario = crearUsuarioModel.NombreDeUsuario,
+                    Contrasena = crearUsuarioModel.Contrasena,
+                    Rol = crearUsuarioModel.Rol
                 };
-                ListaUsuariosModel.Add(newUser);
+                _usuarioRepository.Create(user);
+                return RedirectToAction("Index");
             }
-
-            return View(ListaUsuariosModel);
-        }
-        return RedirectToAction("Index", "Login");
-    }
-
-    [HttpPost("eliminar/{id}")]
-    public IActionResult Eliminar(int id)
-    {
-        if (LoginHelper.IsLogged(HttpContext))
-        {
-
-            var board = _usuarioRepository.GetById(id);
-
-            if (board.Id == 0) return NotFound($"No existe el usuario con ID {id}");
-
-            _usuarioRepository.Delete(id);
-
-            return RedirectToAction("Index");
-        }
-        return RedirectToAction("Index", "Login");
-    }
-
-    [HttpGet("editar/{id}")]
-    public IActionResult Editar(int id)
-    {
-        if (LoginHelper.IsLogged(HttpContext))
-        {
-
-            var board = _usuarioRepository.GetById(id);
-
-            if (board.Id == 0)
+            catch (Exception ex)
             {
-                return NotFound($"No se encontró el usuario con ID {id}");
+                _logger.LogError($"Error en el endpoint Crear de UsuarioController: {ex.Message}");
+                return View("Error");
             }
-            var modificarUsuarioModel = new ModificarUsuarioViewModel
+        }
+
+        [HttpGet("crear")]
+        public IActionResult Crear()
+        {
+            try
             {
-                Id = board.Id,
-                NombreDeUsuario = board.NombreDeUsuario,
-                Contrasena = board.Contrasena,
-                Rol = board.Rol,
-            };
-            return View(modificarUsuarioModel);
-        }
-        return RedirectToAction("Index", "Login");
-    }
-
-    [HttpPost("editar/{id}")]
-    public IActionResult Editar(int id, [FromForm] ModificarUsuarioViewModel modificarUsuarioModel)
-    {
-        if (!LoginHelper.IsLogged(HttpContext)) return RedirectToAction("Index", "Home");
-        if (!ModelState.IsValid) return RedirectToAction("Index", "Home");
-        var existingBoard = _usuarioRepository.GetById(id);
-
-        if (existingBoard.Id == 0)
-        {
-            return NotFound($"No se encontró el tablero con ID {id}");
+                if (LoginHelper.IsLogged(HttpContext))
+                {
+                    return View(new CrearUsuarioViewModel());
+                }
+                return RedirectToAction("Index", "Login");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error en el endpoint Crear (HttpGet) de UsuarioController: {ex.Message}");
+                return View("Error");
+            }
         }
 
-        var newUser = new Usuario
+        [HttpGet]
+        public IActionResult Index()
         {
-            Id = modificarUsuarioModel.Id,
-            NombreDeUsuario = modificarUsuarioModel.NombreDeUsuario,
-            Contrasena = modificarUsuarioModel.Contrasena,
-            Rol = modificarUsuarioModel.Rol,
-        };
+            try
+            {
+                if (LoginHelper.IsLogged(HttpContext))
+                {
+                    List<Usuario> users = _usuarioRepository.List();
 
-        _usuarioRepository.Update(id, newUser);
+                    List<ListarUsuariosViewModel> ListaUsuariosModel = new();
 
-        return RedirectToAction("Index");
+                    foreach (var user in users)
+                    {
+                        var newUser = new ListarUsuariosViewModel
+                        {
+                            NombreDeUsuario = user.NombreDeUsuario,
+                            Id = user.Id
+                        };
+                        ListaUsuariosModel.Add(newUser);
+                    }
+
+                    return View(ListaUsuariosModel);
+                }
+                return RedirectToAction("Index", "Login");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error en el endpoint Index de UsuarioController: {ex.Message}");
+                return View("Error");
+            }
+        }
+
+        [HttpPost("eliminar/{id}")]
+        public IActionResult Eliminar(int id)
+        {
+            try
+            {
+                if (LoginHelper.IsLogged(HttpContext))
+                {
+                    var board = _usuarioRepository.GetById(id);
+
+                    if (board.Id == 0) return NotFound($"No existe el usuario con ID {id}");
+
+                    _usuarioRepository.Delete(id);
+
+                    return RedirectToAction("Index");
+                }
+                return RedirectToAction("Index", "Login");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error en el endpoint Eliminar de UsuarioController: {ex.Message}");
+                return View("Error");
+            }
+        }
+
+        [HttpGet("editar/{id}")]
+        public IActionResult Editar(int id)
+        {
+            try
+            {
+                if (LoginHelper.IsLogged(HttpContext))
+                {
+                    var board = _usuarioRepository.GetById(id);
+
+                    if (board.Id == 0)
+                    {
+                        return NotFound($"No se encontró el usuario con ID {id}");
+                    }
+                    var modificarUsuarioModel = new ModificarUsuarioViewModel
+                    {
+                        Id = board.Id,
+                        NombreDeUsuario = board.NombreDeUsuario,
+                        Contrasena = board.Contrasena,
+                        Rol = board.Rol,
+                    };
+                    return View(modificarUsuarioModel);
+                }
+                return RedirectToAction("Index", "Login");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error en el endpoint Editar (HttpGet) de UsuarioController: {ex.Message}");
+                return View("Error");
+            }
+        }
+
+        [HttpPost("editar/{id}")]
+        public IActionResult Editar(int id, [FromForm] ModificarUsuarioViewModel modificarUsuarioModel)
+        {
+            try
+            {
+                if (!LoginHelper.IsLogged(HttpContext)) return RedirectToAction("Index", "Home");
+                if (!ModelState.IsValid) return RedirectToAction("Index", "Home");
+                var existingBoard = _usuarioRepository.GetById(id);
+
+                if (existingBoard.Id == 0)
+                {
+                    return NotFound($"No se encontró el tablero con ID {id}");
+                }
+
+                var newUser = new Usuario
+                {
+                    Id = modificarUsuarioModel.Id,
+                    NombreDeUsuario = modificarUsuarioModel.NombreDeUsuario,
+                    Contrasena = modificarUsuarioModel.Contrasena,
+                    Rol = modificarUsuarioModel.Rol,
+                };
+
+                _usuarioRepository.Update(id, newUser);
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error en el endpoint Editar (HttpPost) de UsuarioController: {ex.Message}");
+                return View("Error");
+            }
+        }
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
     }
-
 }

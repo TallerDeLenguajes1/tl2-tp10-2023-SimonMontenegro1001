@@ -6,12 +6,12 @@ public class ListarTablerosViewModel
     public string Descripcion { get; set; }
     public string UsuarioPropietario { get; set; }
     public int Id { get; set; }
-    private readonly IUsuarioRepository usuarioRepository;
+    private readonly IUsuarioRepository _usuarioRepository;
 
-    public ListarTablerosViewModel(string nombre, string descipcion, int id, int idUsuarioPropietario)
+    public ListarTablerosViewModel(string nombre, string descipcion, int id, int idUsuarioPropietario, IUsuarioRepository usuarioRepository)
     {
-        usuarioRepository = new UsuarioRepository();
-        var user = usuarioRepository.GetById(idUsuarioPropietario);
+        _usuarioRepository = usuarioRepository;
+        var user = _usuarioRepository.GetById(idUsuarioPropietario);
         if (user.Id == 0) UsuarioPropietario = "";
         else UsuarioPropietario = user.NombreDeUsuario;
         Nombre = nombre;
