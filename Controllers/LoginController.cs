@@ -68,13 +68,8 @@ namespace kanban.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error en el endpoint Login de LoginController: {ex.Message}");
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
-        }
-
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
         private void LogInUser(Usuario user)

@@ -46,7 +46,7 @@ namespace kanban.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error en el endpoint Crear de TareaController: {ex.Message}");
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
@@ -77,7 +77,7 @@ namespace kanban.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error en el endpoint Crear (HttpGet) de TareaController: {ex.Message}");
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
@@ -108,7 +108,7 @@ namespace kanban.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error en el endpoint Editar (HttpGet) de TareaController: {ex.Message}");
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
@@ -143,7 +143,7 @@ namespace kanban.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error en el endpoint Editar (HttpPost) de TareaController: {ex.Message}");
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
@@ -166,7 +166,7 @@ namespace kanban.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error en el endpoint Eliminar de TareaController: {ex.Message}");
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
@@ -195,7 +195,7 @@ namespace kanban.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error en el endpoint Index de TareaController: {ex.Message}");
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
@@ -235,12 +235,8 @@ namespace kanban.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error en el endpoint ListByBoard de TareaController: {ex.Message}");
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
-        }
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

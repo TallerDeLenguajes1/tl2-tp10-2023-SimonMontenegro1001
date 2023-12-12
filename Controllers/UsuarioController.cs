@@ -38,7 +38,7 @@ namespace kanban.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error en el endpoint Crear de UsuarioController: {ex.Message}");
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
@@ -56,7 +56,7 @@ namespace kanban.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error en el endpoint Crear (HttpGet) de UsuarioController: {ex.Message}");
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
@@ -88,7 +88,7 @@ namespace kanban.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error en el endpoint Index de UsuarioController: {ex.Message}");
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
@@ -112,7 +112,7 @@ namespace kanban.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error en el endpoint Eliminar de UsuarioController: {ex.Message}");
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
@@ -143,7 +143,7 @@ namespace kanban.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error en el endpoint Editar (HttpGet) de UsuarioController: {ex.Message}");
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
@@ -176,12 +176,8 @@ namespace kanban.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error en el endpoint Editar (HttpPost) de UsuarioController: {ex.Message}");
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
-        }
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

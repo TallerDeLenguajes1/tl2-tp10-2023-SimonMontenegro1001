@@ -29,6 +29,15 @@ public class HomeController : Controller
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        try
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error en el endpoint Error de HomeController: {ex.Message}");
+            return RedirectToAction("Error", "Home");
+        }
     }
+
 }
