@@ -133,6 +133,46 @@ namespace kanban.Repository
             }
         }
 
+        public List<Tablero> ListUserAssignedBoards(int idUsuario)
+        {
+             try
+            {
+                var query = @"SELECT *
+                                FROM tablero
+                                WHERE id_usuario_propietario = @idUsuario
+                                OR id IN (SELECT id_tablero FROM tarea WHERE id_usuario_asignado = @idUsuario);";
+                var boards = new List<Tablero>();
+
+                using (var connection = new SQLiteConnection(_connectionString))
+                {
+                    var comando = new SQLiteCommand(query, connection);
+                    comando.Parameters.Add(new SQLiteParameter("@idUsuario", idUsuario));
+                    connection.Open();
+
+                    using (SQLiteDataReader reader = comando.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var board = new Tablero()
+                            {
+                                Id = Convert.ToInt32(reader["id"]),
+                                Nombre = reader["nombre"].ToString(),
+                                Descripcion = reader["descripcion"].ToString(),
+                                IdUsuarioPropietario = Convert.ToInt32(reader["id_usuario_propietario"])
+                            };
+                            boards.Add(board);
+                        }
+                    }
+                    connection.Close();
+                }
+                return boards;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener la lista de tableros de usuario.", ex);
+            }
+        }
+
         public List<Tablero> ListUserBoards(int idUsuario)
         {
             try

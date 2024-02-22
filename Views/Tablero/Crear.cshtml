@@ -13,12 +13,14 @@
     </div>
 
 
-    @if (Model.IsAdmin)
+   @if (Model.IsAdmin)
     {
         <div class="mb-3">
-            <label for="lbl.IdUsuarioPropietario" class="form-label" asp-for="IdUsuarioPropietario">ID Usuario Propietario:
-            </label>
-            <input type="number" class="form-control" id="lbl.IdUsuarioPropietario" asp-for="IdUsuarioPropietario">
+            <label for="lbl.IdUsuarioPropietario" class="form-label" asp-for="IdUsuarioPropietario">Usuario Propietario:</label>
+            @Html.DropDownListFor(model => model.IdUsuarioPropietario, 
+                      new SelectList(Model.Usuarios, "Id", "Nombre", Model.IdUsuarioPropietario), 
+                      "-- Seleccionar usuario propietario --", 
+                      new { @class = "form-select" })
         </div>
     }
 

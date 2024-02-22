@@ -17,4 +17,5 @@ public class CrearTareaViewModel
     public string Color { get; set; }
     [Required(ErrorMessage = "Complete el campo")]
     public int? IdUsuarioAsignado { get; set; }
+    public List<UsuarioDropBoxViewModel>? Usuarios { get; set; }
 }

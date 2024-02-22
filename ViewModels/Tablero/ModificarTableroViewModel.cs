@@ -10,4 +10,5 @@ public class ModificarTableroViewModel
     public string Descripcion { get; set; }
     [Required(ErrorMessage = "Complete el campo")]
     public int Id { get; set; }
+    public List<UsuarioDropBoxViewModel>? Usuarios { get; set; }
 }

@@ -9,8 +9,5 @@ public class ModificarUsuarioViewModel
     public string NombreDeUsuario { get; set; }
 
     [Required(ErrorMessage = "Complete el campo")]
-    public string Contrasena { get; set; }
-
-    [Required(ErrorMessage = "Complete el campo")]
     public Roles Rol { get; set; }
 }

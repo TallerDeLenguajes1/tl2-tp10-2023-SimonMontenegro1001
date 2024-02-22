@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using kanban.Models;
 
@@ -70,6 +72,8 @@ namespace kanban.Repository
                         {
                             user.Id = Convert.ToInt32(reader["id"]);
                             user.NombreDeUsuario = reader["nombre_de_usuario"].ToString();
+                            user.Rol = (Roles)Convert.ToInt32(reader["rol"]);
+                            user.Contrasena = reader["contrasena"].ToString();
                         }
                     }
 
@@ -102,7 +106,8 @@ namespace kanban.Repository
                             var user = new Usuario
                             {
                                 Id = Convert.ToInt32(reader["id"]),
-                                NombreDeUsuario = reader["nombre_de_usuario"].ToString()
+                                NombreDeUsuario = reader["nombre_de_usuario"].ToString(),
+                                Rol = (Roles)Convert.ToInt32(reader["rol"])
                             };
                             users.Add(user);
                         }

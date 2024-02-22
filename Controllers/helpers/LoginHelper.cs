@@ -2,7 +2,6 @@ namespace kanban.Controllers.Helpers
 {
     public static class LoginHelper
     {
-
         public static bool IsLogged(HttpContext context)
         {
             if (context.Session.GetString("id") != null)

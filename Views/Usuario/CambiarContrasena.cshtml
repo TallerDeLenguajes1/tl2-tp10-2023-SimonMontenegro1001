@@ -1,0 +1,28 @@
+@model kanban.ViewModels.CambiarContrasenaViewModel
+@{
+    ViewData["Title"] = "Cambiar Contraseña";
+}
+<h2>Cambiar Contraseña</h2>
+
+<form asp-controller="Usuario" asp-action="CambiarContrasena" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <label for="ContrasenaAnterior" class="form-label">Contraseña Anterior:</label>
+        <input type="password" class="form-control" id="ContrasenaAnterior" asp-for="ContrasenaAnterior">
+        <span asp-validation-for="ContrasenaAnterior" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label for="NuevaContrasena" class="form-label">Nueva Contraseña:</label>
+        <input type="password" class="form-control" id="NuevaContrasena" asp-for="NuevaContrasena">
+        <span asp-validation-for="NuevaContrasena" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label for="ConfirmarNuevaContrasena" class="form-label">Confirmar Nueva Contraseña:</label>
+        <input type="password" class="form-control" id="ConfirmarNuevaContrasena" asp-for="ConfirmarNuevaContrasena">
+        <span asp-validation-for="ConfirmarNuevaContrasena" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <span asp-validation-summary="All" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Cambiar Contraseña</button>
+</form>

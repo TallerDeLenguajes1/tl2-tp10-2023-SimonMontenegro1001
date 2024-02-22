@@ -1,0 +1,23 @@
+@model kanban.ViewModels.ModificarUsuarioViewModel
+
+@{
+    ViewData["Title"] = "Editar Usuario";
+}
+
+<h2>Editar Mi Usuario</h2>
+
+<form asp-controller="Usuario" asp-action="Editar" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label for="NombreDeUsuario" class="form-label">Nombre de Usuario: </label>
+        <input type="text" class="form-control" id="NombreDeUsuario" asp-for="NombreDeUsuario" placeholder="Introduce tu nuevo nombre de usuario">
+        <span asp-validation-for="NombreDeUsuario" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+</form>
+
+<div class="mt-3">
+    <a href="@Url.Action("cambiarContrasena", "Usuario", new { id = Model.Id })" class="btn btn-link">Cambiar Contraseña</a>
+</div>

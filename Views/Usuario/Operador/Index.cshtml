@@ -1,0 +1,28 @@
+@{
+    ViewData["Title"] = "Perfil";
+}
+
+@using kanban.ViewModels
+@model UsuarioDropBoxViewModel
+
+<h2>Mi Perfil</h2>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Bienvenido, @Model.Nombre</h5>
+        <div class="row">
+            <div class="col-md-4">
+                <a asp-controller="Tarea" asp-action="Index" asp-route-id="@Model.Id" class="btn btn-info btn-block">Ver Mis Tareas</a>
+            </div>
+            <div class="col-md-4">
+                <a asp-controller="Usuario" asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-primary btn-block">Editar Perfil</a>
+            </div>
+            <div class="col-md-4">
+                <form asp-controller="Usuario" asp-action="Eliminar" asp-route-id="@Model.Id" method="post"
+                      onsubmit="return confirm('¿Estás seguro de que deseas eliminar tu cuenta?')">
+                    <button type="submit" class="btn btn-danger btn-block">Eliminar Cuenta</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -2,7 +2,6 @@ using kanban.Models;
 using kanban.Repository;
 using kanban.Controllers.Helpers;
 using kanban.ViewModels;
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace kanban.Controllers
@@ -30,10 +29,25 @@ namespace kanban.Controllers
             try
             {
                 if (!LoginHelper.IsLogged(HttpContext)) return RedirectToAction("Index", "Login");
+                
                 CrearTableroViewModel crearTableroModel = new()
                 {
                     IsAdmin = LoginHelper.IsAdmin(HttpContext)
                 };
+
+                if(LoginHelper.IsAdmin(HttpContext)) {
+                    var usuarios = _usuarioRepository.List();
+                    List<UsuarioDropBoxViewModel> usuariosViewModel = new();
+
+                    foreach (var usuario in usuarios)
+                    {
+                        UsuarioDropBoxViewModel modelo = new(usuario.Id,usuario.NombreDeUsuario);
+                        usuariosViewModel.Add(modelo);
+                    }
+                    crearTableroModel.Usuarios = usuariosViewModel;
+                    crearTableroModel.IdUsuarioPropietario = int.Parse(LoginHelper.GetUserId(HttpContext));
+                }
+
                 return View(crearTableroModel);
             }
             catch (Exception ex)
@@ -54,12 +68,14 @@ namespace kanban.Controllers
                 var tablero = new Tablero()
                 {
                     Nombre = crearTableroModel.Nombre,
-                    Descripcion = crearTableroModel.Descripcion,
+                    Descripcion = crearTableroModel.Descripcion
                 };
 
                 if (!LoginHelper.IsAdmin(HttpContext))
                 {
                     tablero.IdUsuarioPropietario = int.Parse(LoginHelper.GetUserId(HttpContext));
+                } else {
+                    tablero.IdUsuarioPropietario = crearTableroModel.IdUsuarioPropietario;
                 }
 
                 _tableroRepository.Create(tablero);
@@ -86,7 +102,7 @@ namespace kanban.Controllers
 
                 if (ViewBag.EsAdmin) boards = _tableroRepository.List();
 
-                else boards = _tableroRepository.ListUserBoards(int.Parse(LoginHelper.GetUserId(HttpContext)));
+                else boards = _tableroRepository.ListUserAssignedBoards(int.Parse(LoginHelper.GetUserId(HttpContext)));
 
                 List<ListarTablerosViewModel> ListarTablerosModel = new();
 
@@ -164,6 +180,8 @@ namespace kanban.Controllers
 
                 var board = _tableroRepository.GetById(id);
 
+                if (board.Id == 0) return NotFound($"No existe el tablero con ID {id}");
+
                 var modificarTableroModel = new ModificarTableroViewModel
                 {
                     Nombre = board.Nombre,
@@ -171,7 +189,17 @@ namespace kanban.Controllers
                     Id = board.Id
                 };
 
-                if (board.Id == 0) return NotFound($"No existe el tablero con ID {id}");
+                if(LoginHelper.IsAdmin(HttpContext)) {
+                var usuarios = _usuarioRepository.List();
+                List<UsuarioDropBoxViewModel> usuariosViewModel = new();
+
+                foreach (var usuario in usuarios)
+                {
+                    UsuarioDropBoxViewModel modelo = new(usuario.Id,usuario.NombreDeUsuario);
+                    usuariosViewModel.Add(modelo);
+                }
+                modificarTableroModel.Usuarios = usuariosViewModel;
+                }
 
                 ViewBag.EsAdmin = LoginHelper.IsAdmin(HttpContext);
 

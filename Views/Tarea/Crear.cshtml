@@ -2,11 +2,14 @@
 @model CrearTareaViewModel
 
 <form asp-controller="Tarea" asp-action="Crear" method="post">
-    <input type="hidden" name="tableroId" value="@Model.IdTablero" />
-    <div class="mb-3">
-        <label for="lbl.IdUsuarioAsignado" class="form-label" asp-for="IdUsuarioAsignado">ID Usuario Asignado:
-        </label>
-        <input type="number" class="form-control" id="lbl.IdUsuarioAsignado" asp-for="IdUsuarioAsignado">
+    <input type="hidden" name="boardId" value="@Model.IdTablero" />
+
+     <div class="mb-3">
+        <label for="lbl.IdUsuarioPropietario" class="form-label" asp-for="IdUsuarioAsignado">Usuario Propietario:</label>
+        @Html.DropDownListFor(model => model.IdUsuarioAsignado, 
+                    new SelectList(Model.Usuarios, "Id", "Nombre", Model.IdUsuarioAsignado), 
+                    "-- Seleccionar usuario asignado --", 
+                    new { @class = "form-select" })
     </div>
 
     <div class="mb-3">

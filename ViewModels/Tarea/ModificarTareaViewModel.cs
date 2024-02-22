@@ -24,5 +24,6 @@ public class ModificarTareaViewModel
 
     [Required(ErrorMessage = "Complete el campo")]
     public int? IdUsuarioAsignado { get; set; }
+    public List<UsuarioDropBoxViewModel>? Usuarios { get; set; }
 
 }

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using kanban.Models;
-using System.Diagnostics;
 using kanban.Repository;
 using kanban.Controllers.Helpers;
 using kanban.ViewModels;
@@ -21,15 +20,7 @@ namespace kanban.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            try
-            {
-                return View(new LoginViewModel());
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error en el endpoint Index de LoginCorntoller: {ex.Message}");
-                return View("Error");
-            }
+            return View(new LoginViewModel());
         }
 
         [HttpPost]
@@ -57,7 +48,7 @@ namespace kanban.Controllers
                 {
                     LogInUser(userFound);
                     _logger.LogInformation($"El usuario {loginModel.Username} ingresó correctamente");
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Tablero");
                 }
                 else
                 {
@@ -78,5 +69,24 @@ namespace kanban.Controllers
             HttpContext.Session.SetString("usuario", user.NombreDeUsuario);
             HttpContext.Session.SetString("rol", user.Rol.ToString());
         }
+
+        [HttpPost]
+        public IActionResult Logout()
+        {
+            try
+            {
+                HttpContext.Session.Clear();
+
+                _logger.LogInformation("Usuario desconectado correctamente");
+
+                return RedirectToAction("Index", "Login");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error en el endpoint Logout de LoginController: {ex.Message}");
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
     }
 }
