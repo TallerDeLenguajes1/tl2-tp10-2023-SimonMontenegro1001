@@ -16,15 +16,5 @@
         <label asp-for="Descripcion">Descripcion:</label>
         <input asp-for="Descripcion" class="form-control" />
     </div>
-    @if (ViewBag.EsAdmin)
-    {
-         <div class="mb-3">
-            <label for="lbl.IdUsuarioPropietario" class="form-label" asp-for="IdUsuarioPropietario">Usuario Propietario:</label>
-            @Html.DropDownListFor(model => model.IdUsuarioPropietario, 
-                      new SelectList(Model.Usuarios, "Id", "Nombre", Model.IdUsuarioPropietario), 
-                      "-- Seleccionar usuario propietario --", 
-                      new { @class = "form-select" })
-        </div>
-    }
     <button type="submit" class="btn btn-primary">Guardar Cambios</button>
 </form>

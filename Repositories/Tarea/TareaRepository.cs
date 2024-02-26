@@ -226,5 +226,93 @@ namespace kanban.Repository
                 throw new Exception("Error al actualizar la tarea.", ex);
             }
         }
+
+        public List<Tarea> ListByUserAndBoard(int userId, int boardId)
+        {
+            try
+            {
+                var queryString = @"SELECT * 
+                                    FROM tarea 
+                                    WHERE id_usuario_asignado = @userId 
+                                    AND id_tablero = @boardId;";
+                var tasks = new List<Tarea>();
+
+                using (var connection = new SQLiteConnection(_connectionString))
+                {
+                    var command = new SQLiteCommand(queryString, connection);
+                    command.Parameters.Add(new SQLiteParameter("@userId", userId));
+                    command.Parameters.Add(new SQLiteParameter("@boardId", boardId));
+                    connection.Open();
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var task = new Tarea()
+                            {
+                                Id = Convert.ToInt32(reader["id"]),
+                                IdTablero = Convert.ToInt32(reader["id_tablero"]),
+                                Nombre = reader["nombre"].ToString(),
+                                Estado = (EstadoTarea)Convert.ToInt32(reader["estado"]),
+                                Descripcion = reader["descripcion"].ToString(),
+                                Color = reader["color"].ToString(),
+                                IdUsuarioAsignado = Convert.ToInt32(reader["id_usuario_asignado"])
+                            };
+                            tasks.Add(task);
+                        }
+                    }
+
+                    connection.Close();
+                }
+
+                return tasks;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener la lista de tareas por usuario y tablero.", ex);
+            }
+        }
+
+        public List<Tarea> List() {
+            try
+            {
+                var queryString = @"SELECT * 
+                                    FROM tarea;";
+                var tasks = new List<Tarea>();
+
+                using (var connection = new SQLiteConnection(_connectionString))
+                {
+                    var command = new SQLiteCommand(queryString, connection);
+                    connection.Open();
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var task = new Tarea()
+                            {
+                                Id = Convert.ToInt32(reader["id"]),
+                                IdTablero = Convert.ToInt32(reader["id_tablero"]),
+                                Nombre = reader["nombre"].ToString(),
+                                Estado = (EstadoTarea)Convert.ToInt32(reader["estado"]),
+                                Descripcion = reader["descripcion"].ToString(),
+                                Color = reader["color"].ToString(),
+                                IdUsuarioAsignado = Convert.ToInt32(reader["id_usuario_asignado"])
+                            };
+                            tasks.Add(task);
+                        }
+                    }
+
+                    connection.Close();
+                }
+
+                return tasks;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener la lista de tareas por usuario y tablero.", ex);
+            }
+        }
+        
     }
 }

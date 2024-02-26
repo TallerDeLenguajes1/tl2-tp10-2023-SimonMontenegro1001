@@ -10,4 +10,7 @@ public interface ITareaRepository
     public List<Tarea> ListByBoard(int boardId);
     public void Delete(int taskId);
     public void AssignUser(int userId, int taskId);
+    List<Tarea> ListByUserAndBoard(int userId, int boardId);
+    List<Tarea> List();
+
 }

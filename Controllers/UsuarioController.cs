@@ -229,11 +229,12 @@ namespace kanban.Controllers
                 if (!LoginHelper.IsAdmin(HttpContext)) {
                     if (sesionId != id) return NotFound("No se encontro el recurso.");
                     _usuarioRepository.Delete(id);
+                    HttpContext.Session.Clear();
                     return RedirectToAction("Index", "Login");
                 } else {
                     if(id == sesionId) return NotFound("No se encontro el recurso.");
                     _usuarioRepository.Delete(id);
-                    return RedirectToAction("ListarUsuarios", "Usuarios");
+                    return RedirectToAction("ListarUsuarios", "Usuarios");  
                 }
             }
             catch (Exception ex)

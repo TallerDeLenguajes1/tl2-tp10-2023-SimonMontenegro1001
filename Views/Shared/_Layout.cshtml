@@ -26,12 +26,18 @@
     {
         <li class="nav-item">
             <a class="nav-link" asp-area="" asp-controller="Tablero" asp-action="Index">Tableros</a>
+        </li> 
+        <li class="nav-item">
+            <a class="nav-link" asp-area="" asp-controller="Tarea" asp-action="Index">Mis Tareas</a>
         </li>
 
         @if (LoginHelper.IsAdmin(this.ViewContext.HttpContext))
         {
             <li class="nav-item">
                 <a class="nav-link" asp-area="" asp-controller="Usuario" asp-action="ListarUsuarios">Usuarios</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-controller="Tarea" asp-action="ListarTodasLasTareas">Todas Las Tareas</a>
             </li>
         }
 

@@ -10,9 +10,6 @@ public class CrearTableroViewModel
     
     [Required(ErrorMessage = "Campo requerido")]
     public string Descripcion { get; set; }
-    
-    public bool IsAdmin { get; set; }
-    
     public List<UsuarioDropBoxViewModel>? Usuarios { get; set; }
 }
 

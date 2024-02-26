@@ -1,5 +1,14 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Inicio";
 }
 
-<h1>este es el index de home, falta editarlo</h1>
+<h1>Bienvenido a la página de inicio</h1>
+<p>¡Gracias por visitar nuestra plataforma! Aquí puedes administrar tus tableros y tareas de forma efectiva.</p>
+
+<div>
+    <h2>Opciones:</h2>
+    <ul>
+        <li><a asp-controller="Tablero" asp-action="Crear">Crear un nuevo tablero</a></li>
+        <li><a asp-controller="Usuario" asp-action="Index">Ver mi perfil</a></li>
+    </ul>   
+</div>

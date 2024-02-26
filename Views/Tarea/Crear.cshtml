@@ -28,8 +28,15 @@
     </div>
 
     <div class="mb-3">
-        <label for="lbl.Estado" class="form-label" asp-for="Estado">Estado: </label>
-        <input type="text" class="form-control" id="lbl.Estado" asp-for="Estado">
+        <label asp-for="Estado" class="form-label">Estado: </label>
+        <select asp-for="Estado" class="form-control">
+            <option value="">-- Seleccione un Estado --</option>
+            @foreach (var Estado in Enum.GetValues(typeof(EstadoTarea)))
+            {
+                <option value="@Estado">@Estado</option>
+            }
+        </select>
+        <span asp-validation-for="Estado" class="text-danger"></span>
     </div>
 
 

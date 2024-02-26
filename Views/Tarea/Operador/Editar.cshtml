@@ -1,0 +1,30 @@
+@using kanban.ViewModels
+@model EditarTareaViewModel
+
+@{
+    ViewData["Title"] = "Editar Tarea";
+}
+
+<form asp-controller="Tarea" asp-action="Editar" method="post">
+
+    <input type="hidden" asp-for="Id" />
+
+    <input type="hidden" asp-for="Color" />
+    <input type="hidden" asp-for="Nombre" />
+    <input type="hidden" asp-for="Descripcion" />
+
+
+    <div class="mb-3">
+        <label asp-for="Estado" class="form-label">Estado: </label>
+        <select asp-for="Estado" class="form-control">
+            <option value="">-- Seleccione un Estado --</option>
+            @foreach (var estado in Enum.GetValues(typeof(EstadoTarea)))
+            {
+                <option value="@estado">@estado</option>
+            }
+        </select>
+        <span asp-validation-for="Estado" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Editar</button>
+</form>
