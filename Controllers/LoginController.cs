@@ -28,7 +28,7 @@ namespace kanban.Controllers
         {
             try
             {
-                if (!ModelState.IsValid) return RedirectToAction("Index", "Home");
+                if (!ModelState.IsValid) return View(loginModel);
                 var sessionUsername = LoginHelper.GetUserName(HttpContext);
                 var sessionId = LoginHelper.GetUserId(HttpContext);
 
